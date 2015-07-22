@@ -31,7 +31,7 @@
   margin: 1em 0em;
   background: '';
   box-shadow: none;
-  line-height: 1.14285714em;
+  line-height: 1.15384615em;
   border-radius: 4px;
   border: 1px solid rgba(34, 36, 38, 0.15);
 }
@@ -79,7 +79,7 @@
       -ms-flex-pack: center;
           justify-content: center;
   margin: 0em 0em;
-  padding: 1.14285714em 2em;
+  padding: 1.15384615em 2em;
   background: #ffffff;
   color: #212121;
   box-shadow: none;
@@ -100,8 +100,8 @@
   right: 0%;
   border: medium none;
   background-color: #ffffff;
-  width: 1.14285714em;
-  height: 1.14285714em;
+  width: 1.15384615em;
+  height: 1.15384615em;
   border-style: solid;
   border-color: rgba(34, 36, 38, 0.15);
   border-width: 0px 1px 1px 0px;
@@ -141,7 +141,7 @@
 /* Title */
 .ui.steps .step .title {
   font-family: 'Roboto', 'Helvetica Neue', Arial, Helvetica, sans-serif;
-  font-size: 1.14285714em;
+  font-size: 1.15384615em;
   font-weight: bold;
 }
 .ui.steps .step > .title {
@@ -151,7 +151,7 @@
 /* Description */
 .ui.steps .step .description {
   font-weight: normal;
-  font-size: 0.92857143em;
+  font-size: 0.92307692em;
   color: #212121;
 }
 .ui.steps .step > .description {
@@ -252,12 +252,12 @@
       -ms-flex-pack: start;
           justify-content: flex-start;
   border-radius: 0em;
-  padding: 1.14285714em 2em;
+  padding: 1.15384615em 2em;
   border-right: none;
   border-bottom: 1px solid rgba(34, 36, 38, 0.15);
 }
 .ui.vertical.steps .step:first-child {
-  padding: 1.14285714em 2em;
+  padding: 1.15384615em 2em;
   border-radius: 4px 4px 0em 0em;
 }
 .ui.vertical.steps .step:last-child {
@@ -314,10 +314,10 @@
         -ms-flex-direction: column;
             flex-direction: column;
     border-radius: 0em;
-    padding: 1.14285714em 2em;
+    padding: 1.15384615em 2em;
   }
   .ui.steps .step:first-child {
-    padding: 1.14285714em 2em;
+    padding: 1.15384615em 2em;
     border-radius: 4px 4px 0em 0em;
   }
   .ui.steps .step:last-child {
@@ -460,10 +460,10 @@
         -ms-flex-direction: column;
             flex-direction: column;
     border-radius: 0em;
-    padding: 1.14285714em 2em;
+    padding: 1.15384615em 2em;
   }
   .ui[class*="tablet stackable"].steps .step:first-child {
-    padding: 1.14285714em 2em;
+    padding: 1.15384615em 2em;
     border-radius: 4px 4px 0em 0em;
   }
   .ui[class*="tablet stackable"].steps .step:last-child {
@@ -589,7 +589,7 @@
 
 .ui.small.step,
 .ui.small.steps .step {
-  font-size: 0.92857143rem;
+  font-size: 0.92307692rem;
 }
 .ui.step,
 .ui.steps .step {
@@ -597,7 +597,7 @@
 }
 .ui.large.step,
 .ui.large.steps .step {
-  font-size: 1.14285714rem;
+  font-size: 1.15384615rem;
 }
 
 

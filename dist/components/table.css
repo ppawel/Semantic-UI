@@ -57,7 +57,7 @@
   background: #fafafa;
   text-align: inherit;
   color: #212121;
-  padding: 0.92857143em 0.71428571em;
+  padding: 0.92307692em 0.69230769em;
   vertical-align: inherit;
   font-style: none;
   font-weight: bold;
@@ -88,7 +88,7 @@
   background: #fafafa;
   text-align: inherit;
   color: #212121;
-  padding: 0.71428571em 0.71428571em;
+  padding: 0.69230769em 0.69230769em;
   vertical-align: middle;
   font-style: normal;
   font-weight: normal;
@@ -117,7 +117,7 @@
 
 /* Table Cells */
 .ui.table td {
-  padding: 0.71428571em 0.71428571em;
+  padding: 0.69230769em 0.69230769em;
   text-align: inherit;
 }
 

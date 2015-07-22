@@ -26,7 +26,7 @@
   font-style: normal;
   font-weight: normal;
   line-height: 1.2142em;
-  padding: 0.67861429em 1em;
+  padding: 0.73905385em 1.07692308em;
   font-size: 1em;
   background: #ffffff;
   border: 1px solid rgba(34, 36, 38, 0.15);
@@ -83,7 +83,7 @@
   display: block;
   overflow: hidden;
   font-size: 1em;
-  padding: 0.85714286em 1.14285714em;
+  padding: 0.84615385em 1.15384615em;
   color: #212121;
   line-height: 1.33;
   border-bottom: 1px solid rgba(34, 36, 38, 0.1);
@@ -123,7 +123,7 @@
 }
 .ui.search > .results .result .description {
   margin-top: 0;
-  font-size: 0.92857143em;
+  font-size: 0.92307692em;
   color: rgba(0, 0, 0, 0.4);
 }
 .ui.search > .results .result .price {
@@ -155,7 +155,7 @@
   display: block;
   border-top: none;
   background: #f0f0f0;
-  padding: 0.92857143em 1em;
+  padding: 0.92307692em 1em;
   color: #212121;
   font-weight: bold;
   text-align: center;
@@ -186,9 +186,9 @@
   content: '';
   top: 50%;
   left: 50%;
-  margin: -0.64285714em 0em 0em -0.64285714em;
-  width: 1.28571429em;
-  height: 1.28571429em;
+  margin: -0.65384615em 0em 0em -0.65384615em;
+  width: 1.30769231em;
+  height: 1.30769231em;
   border-radius: 500rem;
   border: 0.2em solid rgba(0, 0, 0, 0.1);
 }
@@ -197,9 +197,9 @@
   content: '';
   top: 50%;
   left: 50%;
-  margin: -0.64285714em 0em 0em -0.64285714em;
-  width: 1.28571429em;
-  height: 1.28571429em;
+  margin: -0.65384615em 0em 0em -0.65384615em;
+  width: 1.30769231em;
+  height: 1.30769231em;
   -webkit-animation: button-spin 0.6s linear;
           animation: button-spin 0.6s linear;
   -webkit-animation-iteration-count: infinite;
@@ -291,7 +291,7 @@
   border-bottom: 1px solid rgba(34, 36, 38, 0.1);
   -webkit-transition: background 0.1s ease, border-color 0.1s ease;
           transition: background 0.1s ease, border-color 0.1s ease;
-  padding: 0.85714286em 1.14285714em;
+  padding: 0.84615385em 1.15384615em;
 }
 .ui.category.search > .results .category:last-child .result:last-child {
   border-bottom: none;
@@ -342,25 +342,25 @@
 ---------------*/
 
 .ui.mini.search {
-  font-size: 0.71428571em;
+  font-size: 0.69230769em;
 }
 .ui.small.search {
-  font-size: 0.92857143em;
+  font-size: 0.92307692em;
 }
 .ui.search {
   font-size: 1em;
 }
 .ui.large.search {
-  font-size: 1.14285714em;
+  font-size: 1.15384615em;
 }
 .ui.big.search {
-  font-size: 1.28571429em;
+  font-size: 1.30769231em;
 }
 .ui.huge.search {
-  font-size: 1.42857143em;
+  font-size: 1.46153846em;
 }
 .ui.massive.search {
-  font-size: 1.71428571em;
+  font-size: 1.69230769em;
 }
 
 
