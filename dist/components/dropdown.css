@@ -1,5 +1,5 @@
 /*!
- * # Semantic UI 2.0.7 - Dropdown
+ * # Semantic UI 2.1.0 - Dropdown
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -78,6 +78,7 @@
 .ui.dropdown > .dropdown.icon {
   position: relative;
   width: auto;
+  font-size: 0.92307692em;
   margin: 0em 0em 0em 1em;
 }
 .ui.dropdown .menu > .item .dropdown.icon {
@@ -1191,16 +1192,16 @@ select.ui.dropdown {
   -webkit-transform: rotate(45deg);
       -ms-transform: rotate(45deg);
           transform: rotate(45deg);
-  width: 0.5em;
-  height: 0.5em;
-  box-shadow: -1px -1px 0px 1px rgba(0, 0, 0, 0.1);
+  width: 0.53846154em;
+  height: 0.53846154em;
+  box-shadow: -1px -1px 0px 1px rgba(34, 36, 38, 0.15);
   background: #ffffff;
   z-index: 2;
 }
 .ui.pointing.dropdown > .menu:after {
-  top: -0.25em;
+  top: -0.26923077em;
   left: 50%;
-  margin: 0em 0em 0em -0.25em;
+  margin: 0em 0em 0em -0.26923077em;
 }
 
 /* Top Left Pointing */
@@ -1219,7 +1220,7 @@ select.ui.dropdown {
   margin: 1em 0em 0em;
 }
 .ui.top.left.pointing.dropdown > .menu:after {
-  top: -0.25em;
+  top: -0.26923077em;
   left: 1em;
   right: auto;
   margin: 0em;
@@ -1237,7 +1238,7 @@ select.ui.dropdown {
   margin: 1em 0em 0em;
 }
 .ui.top.right.pointing.dropdown > .menu:after {
-  top: -0.25em;
+  top: -0.26923077em;
   left: auto;
   right: 1em;
   margin: 0em;
@@ -1255,7 +1256,7 @@ select.ui.dropdown {
 }
 .ui.left.pointing.dropdown > .menu:after {
   top: 1em;
-  left: -0.25em;
+  left: -0.26923077em;
   margin: 0em 0em 0em 0em;
   -webkit-transform: rotate(-45deg);
       -ms-transform: rotate(-45deg);
@@ -1272,7 +1273,7 @@ select.ui.dropdown {
 .ui.right.pointing.dropdown > .menu:after {
   top: 1em;
   left: auto;
-  right: -0.25em;
+  right: -0.26923077em;
   margin: 0em 0em 0em 0em;
   -webkit-transform: rotate(135deg);
       -ms-transform: rotate(135deg);
@@ -1289,7 +1290,7 @@ select.ui.dropdown {
 }
 .ui.bottom.pointing.dropdown > .menu:after {
   top: auto;
-  bottom: -0.25em;
+  bottom: -0.26923077em;
   right: auto;
   margin: 0em;
   -webkit-transform: rotate(-135deg);
@@ -1321,6 +1322,22 @@ select.ui.dropdown {
 .ui.bottom.right.pointing.dropdown > .menu:after {
   left: auto;
   right: 1em;
+}
+
+/* Upward pointing */
+.ui.upward.pointing.dropdown > .menu,
+.ui.upward.top.pointing.dropdown > .menu {
+  top: auto;
+  bottom: 100%;
+  margin: 0em 0em 0.69230769rem;
+  border-radius: 4px;
+}
+.ui.upward.pointing.dropdown > .menu:after,
+.ui.upward.top.pointing.dropdown > .menu:after {
+  top: 100%;
+  bottom: auto;
+  box-shadow: 1px 1px 0px 1px rgba(34, 36, 38, 0.15);
+  margin: -0.26923077em 0em 0em;
 }
 
 

@@ -1,5 +1,5 @@
 /*!
- * # Semantic UI 2.0.7 - Form
+ * # Semantic UI 2.1.0 - Form
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -81,6 +81,12 @@
 .ui.form .ui.input {
   width: 100%;
   vertical-align: top;
+}
+
+/* Set max height on unusual input */
+.ui.form ::-webkit-datetime-edit,
+.ui.form ::-webkit-inner-spin-button {
+  height: 1.2142em;
 }
 .ui.form input:not([type]),
 .ui.form input[type="date"],
@@ -179,9 +185,11 @@
 .ui.form .field > .selection.dropdown > .dropdown.icon {
   float: right;
 }
+.ui.form .inline.fields .field > .selection.dropdown,
 .ui.form .inline.field > .selection.dropdown {
   width: auto;
 }
+.ui.form .inline.fields .field > .selection.dropdown > .dropdown.icon,
 .ui.form .inline.field > .selection.dropdown > .dropdown.icon {
   float: none;
 }
@@ -215,13 +223,19 @@
 ---------------------*/
 
 .ui.form .field .prompt.label {
-  white-space: nowrap;
+  white-space: normal;
+  background: #ffffff !important;
+  border: 1px solid #e0b4b4 !important;
+  color: #9f3a38 !important;
 }
+.ui.form .inline.fields .field .prompt,
 .ui.form .inline.field .prompt {
   margin: -0.5em 0em -0.5em 1em;
 }
+.ui.form .inline.fields .field .prompt:before,
 .ui.form .inline.field .prompt:before {
-  margin-top: -0.3em;
+  margin-top: calc(-0.3em -  1px );
+  border-width: 0px 0px 1px 1px;
   bottom: auto;
   right: auto;
   top: 50%;
@@ -282,22 +296,22 @@
 
 /* Error Placeholder */
 .ui.form .error ::-webkit-input-placeholder {
-  color: #bf4d4b;
+  color: #e7bdbc;
 }
 .ui.form .error ::-ms-input-placeholder {
-  color: #bf4d4b;
+  color: #e7bdbc;
 }
 .ui.form .error ::-moz-placeholder {
-  color: #bf4d4b;
+  color: #e7bdbc;
 }
 .ui.form .error :focus::-webkit-input-placeholder {
-  color: #b2413f;
+  color: #da9796;
 }
 .ui.form .error :focus::-ms-input-placeholder {
-  color: #b2413f;
+  color: #da9796;
 }
 .ui.form .error :focus::-moz-placeholder {
-  color: #b2413f;
+  color: #da9796;
 }
 
 /*--------------------
@@ -336,26 +350,10 @@
 
 
 /* On Form */
-.ui.form.success .success.message {
+.ui.form.success .success.message:not(:empty) {
   display: block;
 }
-.ui.form.success .icon.success.message {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-/*--------------------
-        Error
----------------------*/
-
-
-/* On Form */
-.ui.form.warning .warning.message {
-  display: block;
-}
-.ui.form.warning .icon.warning.message {
+.ui.form.success .icon.success.message:not(:empty) {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -368,10 +366,26 @@
 
 
 /* On Form */
-.ui.form.error .error.message {
+.ui.form.warning .warning.message:not(:empty) {
   display: block;
 }
-.ui.form.error .icon.error.message {
+.ui.form.warning .icon.warning.message:not(:empty) {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+/*--------------------
+        Warning
+---------------------*/
+
+
+/* On Form */
+.ui.form.error .error.message:not(:empty) {
+  display: block;
+}
+.ui.form.error .icon.error.message:not(:empty) {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -649,6 +663,24 @@
 .ui.inverted.form .ui.checkbox label,
 .ui.inverted.form .ui.checkbox .box {
   color: rgba(255, 255, 255, 0.9);
+}
+
+/* Inverted Field */
+.ui.inverted.form input:not([type]),
+.ui.inverted.form input[type="date"],
+.ui.inverted.form input[type="datetime-local"],
+.ui.inverted.form input[type="email"],
+.ui.inverted.form input[type="number"],
+.ui.inverted.form input[type="password"],
+.ui.inverted.form input[type="search"],
+.ui.inverted.form input[type="tel"],
+.ui.inverted.form input[type="time"],
+.ui.inverted.form input[type="text"],
+.ui.inverted.form input[type="url"] {
+  background: #ffffff;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #212121;
+  box-shadow: none;
 }
 
 /*--------------------

@@ -1,5 +1,5 @@
 /*!
- * # Semantic UI 2.0.7 - Search
+ * # Semantic UI 2.1.0 - Search
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -1076,7 +1076,7 @@ $.fn.search.settings = {
   onSelect       : false,
   onResultsAdd   : false,
 
-  onSearchQuery  : function(){},
+  onSearchQuery  : function(query){},
   onResults      : function(response){},
 
   onResultsOpen  : function(){},
