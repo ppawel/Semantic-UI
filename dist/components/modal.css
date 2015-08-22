@@ -87,7 +87,7 @@
 }
 .ui.modal > .header:not(.ui) {
   font-size: 1.46153846rem;
-  line-height: 1.33em;
+  line-height: 1.25em;
   font-weight: bold;
 }
 
@@ -231,7 +231,7 @@
     padding-right: 2.25rem;
   }
   .ui.modal > .close {
-    top: 0.955rem;
+    top: 0.875rem;
     right: 1rem;
     color: #212121;
   }
@@ -412,7 +412,7 @@
   padding-right: 2.25rem;
 }
 .ui.fullscreen.modal > .close {
-  top: 0.955rem;
+  top: 0.875rem;
   right: 1rem;
   color: #212121;
 }

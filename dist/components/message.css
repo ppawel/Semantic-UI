@@ -20,7 +20,7 @@
   margin: 1em 0em;
   background: #f8f8f9;
   padding: 1em 1.5em;
-  line-height: 1.33;
+  line-height: 1.25;
   color: #212121;
   -webkit-transition: opacity 0.1s ease, color 0.1s ease, background 0.1s ease, box-shadow 0.1s ease;
           transition: opacity 0.1s ease, color 0.1s ease, background 0.1s ease, box-shadow 0.1s ease;
@@ -44,7 +44,7 @@
   display: block;
   font-family: 'Roboto', 'Helvetica Neue', Arial, Helvetica, sans-serif;
   font-weight: bold;
-  margin: -0.165em 0em 0rem 0em;
+  margin: -0.125em 0em 0rem 0em;
 }
 
 /* Default font size */
@@ -108,7 +108,7 @@
   cursor: pointer;
   position: absolute;
   margin: 0em;
-  top: 0.835em;
+  top: 0.875em;
   right: 0.5em;
   opacity: 0.7;
   -webkit-transition: opacity 0.1s ease;
