@@ -1,5 +1,5 @@
 /*!
- * # Semantic UI 2.1.0 - Step
+ * # Semantic UI 2.1.4 - Step
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -118,11 +118,6 @@
   border-radius: 4px 0em 0em 4px;
 }
 
-/* Only Step */
-.ui.steps .step:only-child {
-  border-radius: 4px;
-}
-
 /* Last Step */
 .ui.steps .step:last-child {
   border-radius: 0em 4px 4px 0em;
@@ -130,6 +125,11 @@
 .ui.steps .step:last-child {
   border-right: none;
   margin-right: 0em;
+}
+
+/* Only Step */
+.ui.steps .step:only-child {
+  border-radius: 4px;
 }
 
 
@@ -263,6 +263,9 @@
 .ui.vertical.steps .step:last-child {
   border-bottom: none;
   border-radius: 0em 0em 4px 4px;
+}
+.ui.vertical.steps .step:only-child {
+  border-radius: 4px;
 }
 
 /* Arrow */

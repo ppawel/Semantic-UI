@@ -377,7 +377,7 @@
 
 @media only screen and (max-width: @largestMobileScreen) {
   .ui.menu > .ui.container {
-    width: 100%;
+    width: 100% !important;
     margin-left: 0em !important;
     margin-right: 0em !important;
   }
@@ -571,13 +571,13 @@ Floated Menu / Item
   box-shadow: @verticalActiveBoxShadow;
 }
 .ui.vertical.menu > .active.item:first-child {
-  border-radius: 0em @borderRadius 0em 0em;
+  border-radius: @borderRadius @borderRadius 0em 0em;
 }
 .ui.vertical.menu > .active.item:last-child {
-  border-radius: 0em 0em @borderRadius 0em;
+  border-radius: 0em 0em @borderRadius @borderRadius;
 }
 .ui.vertical.menu > .active.item:only-child {
-  border-radius: 0em @borderRadius @borderRadius 0em;
+  border-radius: @borderRadius;
 }
 .ui.vertical.menu .active.item .menu .active.item {
   border-left: none;
@@ -642,8 +642,9 @@ Floated Menu / Item
   width: 100%;
 }
 .top.attached.segment + .ui.bottom.tabular.menu {
+  position: relative;
   width: @tabularFluidWidth;
-  margin: 0px 0px 0px -@tabularFluidOffset;
+  left: -@tabularFluidOffset;
 }
 
 /* Bottom Vertical Tabular */
@@ -857,6 +858,15 @@ Floated Menu / Item
   box-shadow: none;
 }
 
+/* Sub Menu */
+.ui.vertical.secondary.menu .item:not(.dropdown) > .menu {
+  margin: @secondaryMenuSubMenuMargin;
+}
+.ui.vertical.secondary.menu .item:not(.dropdown) > .menu > .item {
+  margin: @secondaryMenuSubMenuItemMargin;
+  padding: @secondaryMenuSubMenuItemPadding;
+}
+
 
 /*---------------------
    Secondary Vertical
@@ -1021,11 +1031,6 @@ Floated Menu / Item
   transition: @textMenuItemTransition;
 }
 
-/* Sub Menu */
-.ui.vertical.text.menu > .menu {
-  margin: @textMenuSubMenuMargin;
-}
-
 /* Border */
 .ui.text.menu .item:before,
 .ui.text.menu .menu .item:before {
@@ -1071,6 +1076,15 @@ Floated Menu / Item
 }
 .ui.vertical.text.menu .header.item {
   margin: @textVerticalMenuHeaderMargin;
+}
+
+/* Vertical Sub Menu */
+.ui.vertical.text.menu .item:not(.dropdown) > .menu {
+  margin: @textMenuSubMenuMargin;
+}
+.ui.vertical.text.menu .item:not(.dropdown) > .menu > .item {
+  margin: @textMenuSubMenuItemMargin;
+  padding: @textMenuSubMenuItemPadding;
 }
 
 /*--- hover ---*/
@@ -1404,6 +1418,7 @@ Floated Menu / Item
 ---------------*/
 
 /* Red */
+.ui.inverted.menu .red.active.item,
 .ui.inverted.red.menu {
   background-color: @red;
 }
@@ -1415,6 +1430,7 @@ Floated Menu / Item
 }
 
 /* Orange */
+.ui.inverted.menu .orange.active.item,
 .ui.inverted.orange.menu {
   background-color: @orange;
 }
@@ -1426,6 +1442,7 @@ Floated Menu / Item
 }
 
 /* Yellow */
+.ui.inverted.menu .yellow.active.item,
 .ui.inverted.yellow.menu {
   background-color: @yellow;
 }
@@ -1437,6 +1454,7 @@ Floated Menu / Item
 }
 
 /* Olive */
+.ui.inverted.menu .olive.active.item,
 .ui.inverted.olive.menu {
   background-color: @olive;
 }
@@ -1448,6 +1466,7 @@ Floated Menu / Item
 }
 
 /* Green */
+.ui.inverted.menu .green.active.item,
 .ui.inverted.green.menu {
   background-color: @green;
 }
@@ -1459,6 +1478,7 @@ Floated Menu / Item
 }
 
 /* Teal */
+.ui.inverted.menu .teal.active.item,
 .ui.inverted.teal.menu {
   background-color: @teal;
 }
@@ -1470,6 +1490,7 @@ Floated Menu / Item
 }
 
 /* Blue */
+.ui.inverted.menu .blue.active.item,
 .ui.inverted.blue.menu {
   background-color: @blue;
 }
@@ -1481,6 +1502,7 @@ Floated Menu / Item
 }
 
 /* Violet */
+.ui.inverted.menu .violet.active.item,
 .ui.inverted.violet.menu {
   background-color: @violet;
 }
@@ -1492,6 +1514,7 @@ Floated Menu / Item
 }
 
 /* Purple */
+.ui.inverted.menu .purple.active.item,
 .ui.inverted.purple.menu {
   background-color: @purple;
 }
@@ -1503,6 +1526,7 @@ Floated Menu / Item
 }
 
 /* Pink */
+.ui.inverted.menu .pink.active.item,
 .ui.inverted.pink.menu {
   background-color: @pink;
 }
@@ -1514,6 +1538,7 @@ Floated Menu / Item
 }
 
 /* Brown */
+.ui.inverted.menu .brown.active.item,
 .ui.inverted.brown.menu {
   background-color: @brown;
 }
@@ -1525,6 +1550,7 @@ Floated Menu / Item
 }
 
 /* Grey */
+.ui.inverted.menu .grey.active.item,
 .ui.inverted.grey.menu {
   background-color: @grey;
 }
@@ -1610,8 +1636,10 @@ Floated Menu / Item
 .ui.item.menu,
 .ui.item.menu .item {
   width: 100%;
-  padding-left: 0px !important;
-  padding-right: 0px !important;
+  padding-left: 0em !important;
+  padding-right: 0em !important;
+  margin-left: 0em !important;
+  margin-right: 0em !important;
   text-align: center;
   justify-content: center;
 }

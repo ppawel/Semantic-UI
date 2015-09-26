@@ -1,5 +1,5 @@
 /*!
- * # Semantic UI 2.1.0 - Form
+ * # Semantic UI 2.1.4 - Form
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -77,8 +77,7 @@
 .ui.form input[type="tel"],
 .ui.form input[type="time"],
 .ui.form input[type="text"],
-.ui.form input[type="url"],
-.ui.form .ui.input {
+.ui.form input[type="url"] {
   width: 100%;
   vertical-align: top;
 }
@@ -114,11 +113,6 @@
   box-shadow: 0em 0em 0em 0em transparent inset;
   -webkit-transition: color 0.1s ease, border-color 0.1s ease;
           transition: color 0.1s ease, border-color 0.1s ease;
-}
-
-/* Collapse Flex */
-.ui.form .ui.input > input {
-  width: 0px !important;
 }
 
 /* Text Area */
@@ -179,12 +173,16 @@
        Dropdown
 ---------------------*/
 
+
+/* Block */
 .ui.form .field > .selection.dropdown {
   width: 100%;
 }
 .ui.form .field > .selection.dropdown > .dropdown.icon {
   float: right;
 }
+
+/* Inline */
 .ui.form .inline.fields .field > .selection.dropdown,
 .ui.form .inline.field > .selection.dropdown {
   width: auto;
@@ -192,6 +190,49 @@
 .ui.form .inline.fields .field > .selection.dropdown > .dropdown.icon,
 .ui.form .inline.field > .selection.dropdown > .dropdown.icon {
   float: none;
+}
+
+/*--------------------
+       UI Input
+---------------------*/
+
+
+/* Block */
+.ui.form .field .ui.input,
+.ui.form .fields .field .ui.input,
+.ui.form .wide.field .ui.input {
+  width: 100%;
+}
+
+/* Inline  */
+.ui.form .inline.fields .field:not(.wide) .ui.input,
+.ui.form .inline.field:not(.wide) .ui.input {
+  width: auto;
+  vertical-align: middle;
+}
+
+/* Auto Input */
+.ui.form .fields .field .ui.input input,
+.ui.form .field .ui.input input {
+  width: auto;
+}
+
+/* Full Width Input */
+.ui.form .ten.fields .ui.input input,
+.ui.form .nine.fields .ui.input input,
+.ui.form .eight.fields .ui.input input,
+.ui.form .seven.fields .ui.input input,
+.ui.form .six.fields .ui.input input,
+.ui.form .five.fields .ui.input input,
+.ui.form .four.fields .ui.input input,
+.ui.form .three.fields .ui.input input,
+.ui.form .two.fields .ui.input input,
+.ui.form .wide.field .ui.input input {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1 0 auto;
+      -ms-flex: 1 0 auto;
+          flex: 1 0 auto;
+  width: 0px;
 }
 
 /*--------------------
@@ -230,11 +271,11 @@
 }
 .ui.form .inline.fields .field .prompt,
 .ui.form .inline.field .prompt {
-  margin: -0.5em 0em -0.5em 1em;
+  vertical-align: top;
+  margin: -0.25em 0em -0.5em 0.5em;
 }
 .ui.form .inline.fields .field .prompt:before,
 .ui.form .inline.field .prompt:before {
-  margin-top: calc(-0.3em -  1px );
   border-width: 0px 0px 1px 1px;
   bottom: auto;
   right: auto;
@@ -330,14 +371,14 @@
 .ui.form input[type="text"]:focus,
 .ui.form input[type="url"]:focus {
   color: rgba(0, 0, 0, 0.95);
-  border-color: rgba(34, 36, 38, 0.35);
+  border-color: #85b7d9;
   border-radius: 4px;
   background: #ffffff;
   box-shadow: 0px 0em 0em 0em rgba(34, 36, 38, 0.35) inset;
 }
 .ui.form textarea:focus {
   color: rgba(0, 0, 0, 0.95);
-  border-color: rgba(34, 36, 38, 0.35);
+  border-color: #85b7d9;
   border-radius: 4px;
   background: #ffffff;
   box-shadow: 0px 0em 0em 0em rgba(34, 36, 38, 0.35) inset;
@@ -377,7 +418,7 @@
 }
 
 /*--------------------
-        Warning
+        Error
 ---------------------*/
 
 
@@ -540,6 +581,7 @@
 .ui.form .disabled.fields .field,
 .ui.form .disabled.field,
 .ui.form .field :disabled {
+  pointer-events: none;
   opacity: 0.45;
 }
 .ui.form .field.disabled label {
@@ -950,10 +992,8 @@
 /* Inline Input */
 .ui.form .inline.fields .field > input,
 .ui.form .inline.fields .field > select,
-.ui.form .inline.fields .field > .ui.input,
 .ui.form .inline.field > input,
-.ui.form .inline.field > select,
-.ui.form .inline.field > .ui.input {
+.ui.form .inline.field > select {
   display: inline-block;
   width: auto;
   margin-top: 0em;
@@ -984,8 +1024,7 @@
           align-items: center;
 }
 .ui.form .inline.fields .wide.field > input,
-.ui.form .inline.fields .wide.field > select,
-.ui.form .inline.fields .wide.field > .ui.input {
+.ui.form .inline.fields .wide.field > select {
   width: 100%;
 }
 

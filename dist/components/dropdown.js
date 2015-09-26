@@ -1,5 +1,5 @@
 /*!
- * # Semantic UI 2.1.0 - Dropdown
+ * # Semantic UI 2.1.4 - Dropdown
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -39,6 +39,7 @@ $.fn.dropdown = function(parameters) {
 
         className       = settings.className,
         message         = settings.message,
+        fields          = settings.fields,
         metadata        = settings.metadata,
         namespace       = settings.namespace,
         regExp          = settings.regExp,
@@ -180,10 +181,11 @@ $.fn.dropdown = function(parameters) {
             ;
             $.each(values, function(index, value) {
               if(module.get.item(value) === false) {
-                html         = settings.templates.addition(value);
+                html         = settings.templates.addition( module.add.variables(message.addResult, value) );
                 $userChoice  = $('<div />')
                   .html(html)
-                  .data(metadata.value, value)
+                  .attr('data-' + metadata.value, value)
+                  .attr('data-' + metadata.text, value)
                   .addClass(className.addition)
                   .addClass(className.item)
                 ;
@@ -319,6 +321,10 @@ $.fn.dropdown = function(parameters) {
               if($input.is('[multiple]')) {
                 module.set.multiple();
               }
+              if ($input.prop('disabled')) {
+                module.debug('Disabling dropdown')
+                $module.addClass(className.disabled)
+              }
               $input
                 .removeAttr('class')
                 .detach()
@@ -328,7 +334,7 @@ $.fn.dropdown = function(parameters) {
             module.refresh();
           },
           menu: function(values) {
-            $menu.html( templates.menu( values ));
+            $menu.html( templates.menu(values, fields));
             $item = $menu.find(selector.item);
           },
           reference: function() {
@@ -724,7 +730,6 @@ $.fn.dropdown = function(parameters) {
               })
             ;
           }
-
           module.debug('Showing only matched items', searchTerm);
           module.remove.filteredItem();
           $item
@@ -820,7 +825,7 @@ $.fn.dropdown = function(parameters) {
               module.hide();
             }
           },
-          // prevents focus callback from occuring on mousedown
+          // prevents focus callback from occurring on mousedown
           mousedown: function() {
             activated = true;
           },
@@ -1147,6 +1152,7 @@ $.fn.dropdown = function(parameters) {
                 hasSubMenu           = ($subMenu.length> 0),
                 hasSelectedItem      = ($selectedItem.length > 0),
                 selectedIsSelectable = ($selectedItem.not(selector.unselectable).length > 0),
+                delimiterPressed     = (pressedKey == keys.delimiter && settings.allowAdditions && module.is.multiple()),
                 $nextItem,
                 isSubMenuItem,
                 newIndex
@@ -1156,7 +1162,7 @@ $.fn.dropdown = function(parameters) {
               if( module.is.visible() ) {
 
                 // enter (select or open sub-menu)
-                if(pressedKey == keys.enter || pressedKey == keys.delimiter) {
+                if(pressedKey == keys.enter || delimiterPressed) {
                   if(pressedKey == keys.enter && hasSelectedItem && hasSubMenu && !settings.allowCategorySelection) {
                     module.verbose('Pressed enter on unselectable category, opening sub menu');
                     pressedKey = keys.rightArrow;
@@ -1273,7 +1279,7 @@ $.fn.dropdown = function(parameters) {
               }
               else {
                 // delimiter key
-                if(pressedKey == keys.delimiter) {
+                if(delimiterPressed) {
                   event.preventDefault();
                 }
                 // down arrow (open menu)
@@ -1563,10 +1569,10 @@ $.fn.dropdown = function(parameters) {
               return false;
             }
             return ($choice.data(metadata.value) !== undefined)
-              ? $choice.data(metadata.value)
+              ? String( $choice.data(metadata.value) )
               : (typeof choiceText === 'string')
                 ? $.trim(choiceText.toLowerCase())
-                : choiceText
+                : String(choiceText)
             ;
           },
           inputEvent: function() {
@@ -1689,7 +1695,7 @@ $.fn.dropdown = function(parameters) {
                     return;
                   }
                   if(isMultiple) {
-                    if($.inArray(optionValue.toString(), value) !== -1 || $.inArray(optionText, value) !== -1) {
+                    if($.inArray( String(optionValue), value) !== -1 || $.inArray(optionText, value) !== -1) {
                       $selectedItem = ($selectedItem)
                         ? $selectedItem.add($choice)
                         : $choice
@@ -1704,7 +1710,7 @@ $.fn.dropdown = function(parameters) {
                     }
                   }
                   else {
-                    if( optionValue.toString() == value.toString() || optionText == value) {
+                    if( String(optionValue) == String(value) || optionText == value) {
                       module.verbose('Found select item by value', optionValue, value);
                       $selectedItem = $choice;
                       return true;
@@ -2019,6 +2025,14 @@ $.fn.dropdown = function(parameters) {
             module.verbose('Setting initial load');
             initialLoad = true;
           },
+          activeItem: function($item) {
+            if( settings.allowAdditions && $item.filter(selector.addition).length > 0 ) {
+              $item.addClass(className.filtered);
+            }
+            else {
+              $item.addClass(className.active);
+            }
+          },
           scrollPosition: function($item, forceScroll) {
             var
               edgeTolerance = 5,
@@ -2144,8 +2158,8 @@ $.fn.dropdown = function(parameters) {
               hasInput     = ($input.length > 0),
               isAddition   = !module.has.value(value),
               currentValue = module.get.values(),
-              stringValue  = (typeof value == 'number')
-                ? value.toString()
+              stringValue  = (value !== undefined)
+                ? String(value)
                 : value,
               newValue
             ;
@@ -2244,14 +2258,14 @@ $.fn.dropdown = function(parameters) {
                     if(settings.useLabels) {
                       module.add.value(selectedValue, selectedText, $selected);
                       module.add.label(selectedValue, selectedText, shouldAnimate);
-                      $selected.addClass(className.active);
+                      module.set.activeItem($selected);
                       module.filterActive();
                       module.select.nextAvailable($selectedItem);
                     }
                     else {
                       module.add.value(selectedValue, selectedText, $selected);
                       module.set.text(module.add.variables(message.count));
-                      $selected.addClass(className.active);
+                      module.set.activeItem($selected);
                     }
                   }
                   else if(!isFiltered) {
@@ -2364,7 +2378,8 @@ $.fn.dropdown = function(parameters) {
           userSuggestion: function(value) {
             var
               $addition         = $menu.children(selector.addition),
-              alreadyHasValue   = module.get.item(value),
+              $existingItem     = module.get.item(value),
+              alreadyHasValue   = $existingItem && $existingItem.not(selector.addition).length,
               hasUserSuggestion = $addition.length > 0,
               html
             ;
@@ -2379,10 +2394,11 @@ $.fn.dropdown = function(parameters) {
               .removeClass(className.selected)
             ;
             if(hasUserSuggestion) {
-              html = settings.templates.addition(value);
+              html = settings.templates.addition( module.add.variables(message.addResult, value) );
               $addition
                 .html(html)
-                .data(metadata.value, value)
+                .attr('data-' + metadata.value, value)
+                .attr('data-' + metadata.text, value)
                 .removeClass(className.filtered)
                 .addClass(className.selected)
               ;
@@ -2397,7 +2413,7 @@ $.fn.dropdown = function(parameters) {
               module.verbose('Adding item choice to menu corresponding with user choice addition', $addition);
             }
           },
-          variables: function(message) {
+          variables: function(message, term) {
             var
               hasCount    = (message.search('{count}') !== -1),
               hasMaxCount = (message.search('{maxCount}') !== -1),
@@ -2416,7 +2432,7 @@ $.fn.dropdown = function(parameters) {
               message = message.replace('{maxCount}', settings.maxSelections);
             }
             if(hasTerm) {
-              query   = module.get.query();
+              query   = term || module.get.query();
               message = message.replace('{term}', query);
             }
             return message;
@@ -2549,7 +2565,12 @@ $.fn.dropdown = function(parameters) {
                   }
                   else {
                     module.remove.value(selectedValue, selectedText, $selected);
-                    module.set.text(module.add.variables(message.count));
+                    if(module.get.selectionCount() === 0) {
+                      module.set.placeholderText();
+                    }
+                    else {
+                      module.set.text(module.add.variables(message.count));
+                    }
                   }
                 }
                 else {
@@ -2622,8 +2643,8 @@ $.fn.dropdown = function(parameters) {
               .each(function(){
                 var
                   value       = $(this).data(metadata.value),
-                  stringValue = (typeof value == 'number')
-                    ? value.toString()
+                  stringValue = (value !== undefined)
+                    ? String(value)
                     : value,
                   isUserValue = module.is.userValue(stringValue)
                 ;
@@ -3213,7 +3234,7 @@ $.fn.dropdown.settings = {
 
   maxSelections          : false,      // When set to a number limits the number of selections to this count
   useLabels              : true,       // whether multiple select should filter currently active selections from choices
-  delimiter              : ',',        // when multiselect uses normal <input> the values will be delmited with this character
+  delimiter              : ',',        // when multiselect uses normal <input> the values will be delimited with this character
 
   showOnFocus            : true,       // show menu on focus
   allowTab               : true,       // add tabindex to element
@@ -3287,6 +3308,13 @@ $.fn.dropdown.settings = {
     value           : 'value'
   },
 
+  // property names for remote query
+  fields: {
+    values : 'values', // grouping for all dropdown values
+    name   : 'name',   // displayed dropdown text
+    value  : 'value'   // actual dropdown value
+  },
+
   selector : {
     addition     : '.addition',
     dropdown     : '.ui.dropdown',
@@ -3357,13 +3385,13 @@ $.fn.dropdown.settings.templates = {
   },
 
   // generates just menu from select
-  menu: function(response) {
+  menu: function(response, fields) {
     var
       values = response.values || {},
       html   = ''
     ;
-    $.each(response.values, function(index, option) {
-      html += '<div class="item" data-value="' + option.value + '">' + option.name + '</div>';
+    $.each(response[fields.values], function(index, option) {
+      html += '<div class="item" data-value="' + option[fields.value] + '">' + option[fields.name] + '</div>';
     });
     return html;
   },

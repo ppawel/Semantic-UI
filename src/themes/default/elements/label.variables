@@ -123,10 +123,9 @@
 @tagTriangleTopOffset: 50%;
 @tagTriangleSize: 1.56em;
 @tagTriangleBackgroundImage: none;
-@tagTransition: background @labelTransitionDuration @labelTransitionEasing;
+@tagTransition: none; /* Avoids error with background: inherit; on animation */
 
 /* Ribbon */
-@ribbonImageTopDistance: 1rem;
 @ribbonTriangleSize: 1.2em;
 @ribbonShadowColor: rgba(0, 0, 0, 0.15);
 
@@ -135,9 +134,15 @@
 @ribbonDistance: ~"calc("@ribbonMargin~" + "@ribbonTriangleSize~")";
 @rightRibbonOffset:  ~"calc(100% + "@ribbonMargin~" + "@ribbonTriangleSize~")";
 
+@ribbonImageTopDistance: 1rem;
 @ribbonImageMargin: -0.05rem; /* Rounding Offset on Triangle */
 @ribbonImageOffset: ~"calc("-@ribbonImageMargin~" - "@ribbonTriangleSize~")";
 @rightRibbonImageOffset:  ~"calc(100% + "@ribbonImageMargin~" + "@ribbonTriangleSize~")";
+
+@ribbonTableMargin: @relativeMini; /* Rounding Offset on Triangle */
+@ribbonTableOffset: ~"calc("-@ribbonTableMargin~" - "@ribbonTriangleSize~")";
+@rightRibbonTableOffset:  ~"calc(100% + "@ribbonTableMargin~" + "@ribbonTriangleSize~")";
+
 
 /* Colors */
 @redTextColor: @white;
@@ -223,12 +228,11 @@
 @pointingTriangleSize: 0.6666em;
 @pointingHorizontalDistance: @pointingTriangleSize;
 
-@pointingTriangleOffset: -@pointingTriangleSize / 2;
 @pointingTriangleTransition: background @labelTransitionDuration @labelTransitionEasing;
 @pointingTriangleZIndex: 2;
 
 /* Basic Pointing */
-@basicPointingTriangleOffset: ~"calc("(-@pointingTriangleSize / 2)~" - "@pointingBorderWidth~")";
+@basicPointingTriangleOffset: -@pointingBorderWidth;
 
 /* Floating */
 @floatingTopOffset: -1em;

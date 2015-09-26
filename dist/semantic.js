@@ -1,5 +1,5 @@
  /*
- * # Semantic UI - 2.1.0
+ * # Semantic UI - 2.1.4
  * https://github.com/Semantic-Org/Semantic-UI
  * http://www.semantic-ui.com/
  *
@@ -9,7 +9,7 @@
  *
  */
 /*!
- * # Semantic UI 2.1.0 - Site
+ * # Semantic UI 2.1.4 - Site
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -91,7 +91,7 @@ $.site = $.fn.site = function(parameters) {
       requestAnimationFrame: function() {
         module.debug('Normalizing requestAnimationFrame');
         if(window.requestAnimationFrame === undefined) {
-          module.debug('RequestAnimationFrame not available, normailizing event');
+          module.debug('RequestAnimationFrame not available, normalizing event');
           window.requestAnimationFrame = window.requestAnimationFrame
             || window.mozRequestAnimationFrame
             || window.webkitRequestAnimationFrame
@@ -495,8 +495,9 @@ $.extend($.expr[ ":" ], {
 
 
 })( jQuery, window , document );
+
 /*!
- * # Semantic UI 2.1.0 - Form Validation
+ * # Semantic UI 2.1.4 - Form Validation
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -722,13 +723,16 @@ $.fn.form = function(parameters) {
         },
 
         is: {
+          bracketedRule: function(rule) {
+            return (rule.type && rule.type.match(settings.regExp.bracket));
+          },
           valid: function() {
             var
               allValid = true
             ;
             module.verbose('Checking if form is valid');
             $.each(validation, function(fieldName, field) {
-              if( !( module.validate.field(field) ) ) {
+              if( !( module.validate.field(field, fieldName) ) ) {
                 allValid = false;
               }
             });
@@ -782,7 +786,7 @@ $.fn.form = function(parameters) {
             keyup: function() {
               keyHeldDown = false;
             },
-            blur: function() {
+            blur: function(event) {
               var
                 $field          = $(this),
                 $fieldGroup     = $field.closest($group),
@@ -790,13 +794,13 @@ $.fn.form = function(parameters) {
               ;
               if( $fieldGroup.hasClass(className.error) ) {
                 module.debug('Revalidating field', $field, validationRules);
-                module.validate.field( validationRules );
+                module.validate.form.call(module, event, true);
               }
               else if(settings.on == 'blur' || settings.on == 'change') {
                 module.validate.field( validationRules );
               }
             },
-            change: function() {
+            change: function(event) {
               var
                 $field      = $(this),
                 $fieldGroup = $field.closest($group)
@@ -805,7 +809,7 @@ $.fn.form = function(parameters) {
                 clearTimeout(module.timer);
                 module.timer = setTimeout(function() {
                   module.debug('Revalidating field', $field,  module.get.validation($field));
-                  module.validate.field( module.get.validation($field) );
+                  module.validate.form.call(module, event, true);
                 }, settings.delay);
               }
             }
@@ -814,6 +818,18 @@ $.fn.form = function(parameters) {
         },
 
         get: {
+          ancillaryValue: function(rule) {
+            if(!rule.type || !module.is.bracketedRule(rule)) {
+              return false;
+            }
+            return rule.type.match(settings.regExp.bracket)[1] + '';
+          },
+          ruleName: function(rule) {
+            if( module.is.bracketedRule(rule) ) {
+              return rule.type.replace(rule.type.match(settings.regExp.bracket)[0], '');
+            }
+            return rule.type;
+          },
           changeEvent: function(type, $input) {
             if(type == 'checkbox' || type == 'radio' || type == 'hidden' || $input.is('select')) {
               return 'change';
@@ -830,16 +846,46 @@ $.fn.form = function(parameters) {
                 : 'keyup'
             ;
           },
-          settings: function() {
+          prompt: function(rule, field) {
             var
-              firstProperty
+              ruleName      = module.get.ruleName(rule),
+              ancillary     = module.get.ancillaryValue(rule),
+              prompt        = rule.prompt || settings.prompt[ruleName] || settings.text.unspecifiedRule,
+              requiresValue = (prompt.search('{value}') !== -1),
+              requiresName  = (prompt.search('{name}') !== -1),
+              $label,
+              $field,
+              name
             ;
+            if(requiresName || requiresValue) {
+              $field = module.get.field(field.identifier);
+            }
+            if(requiresValue) {
+              prompt = prompt.replace('{value}', $field.val());
+            }
+            if(requiresName) {
+              $label = $field.closest(selector.group).find('label').eq(0);
+              name = ($label.size() == 1)
+                ? $label.text()
+                : $field.prop('placeholder') || settings.text.unspecifiedField
+              ;
+              prompt = prompt.replace('{name}', name);
+            }
+            prompt = prompt.replace('{identifier}', field.identifier);
+            prompt = prompt.replace('{ruleValue}', ancillary);
+            if(!rule.prompt) {
+              module.verbose('Using default validation prompt for type', prompt, ruleName);
+            }
+            return prompt;
+          },
+          settings: function() {
             if($.isPlainObject(parameters)) {
               var
-                keys             = Object.keys(parameters),
+                keys     = Object.keys(parameters),
                 isLegacySettings = (keys.length > 0)
                   ? (parameters[keys[0]].identifier !== undefined && parameters[keys[0]].rules !== undefined)
-                  : false
+                  : false,
+                ruleKeys
               ;
               if(isLegacySettings) {
                 // 1.x (ducktyped)
@@ -850,6 +896,23 @@ $.fn.form = function(parameters) {
               }
               else {
                 // 2.x
+                if(parameters.fields) {
+                  ruleKeys = Object.keys(parameters.fields);
+                  if( typeof parameters.fields[ruleKeys[0]] == 'string' || $.isArray(parameters.fields[ruleKeys[0]]) ) {
+                    $.each(parameters.fields, function(name, rules) {
+                      if(typeof rules == 'string') {
+                        rules = [rules];
+                      }
+                      parameters.fields[name] = {
+                        rules: []
+                      };
+                      $.each(rules, function(index, rule) {
+                        parameters.fields[name].rules.push({ type: rule });
+                      });
+                    });
+                  }
+                }
+
                 settings   = $.extend(true, {}, $.fn.form.settings, parameters);
                 validation = $.extend({}, $.fn.form.settings.defaults, settings.fields);
                 module.verbose('Extending settings', validation, settings);
@@ -903,17 +966,20 @@ $.fn.form = function(parameters) {
           },
           validation: function($field) {
             var
-              rules
+              fieldValidation,
+              identifier
             ;
             if(!validation) {
               return false;
             }
             $.each(validation, function(fieldName, field) {
-              if( module.get.field(field.identifier)[0] == $field[0] ) {
-                rules = field;
+              identifier = field.identifier || fieldName;
+              if( module.get.field(identifier)[0] == $field[0] ) {
+                field.identifier = identifier;
+                fieldValidation = field;
               }
             });
-            return rules || false;
+            return fieldValidation || false;
           },
           value: function (field) {
             var
@@ -952,7 +1018,7 @@ $.fn.form = function(parameters) {
                   }
                   if(isCheckbox) {
                     if(isChecked) {
-                      values[name].push(true);
+                      values[name].push(value || true);
                     }
                     else {
                       values[name].push(false);
@@ -970,7 +1036,7 @@ $.fn.form = function(parameters) {
                   }
                   else if(isCheckbox) {
                     if(isChecked) {
-                      values[name] = true;
+                      values[name] = value || true;
                     }
                     else {
                       values[name] = false;
@@ -1052,6 +1118,7 @@ $.fn.form = function(parameters) {
           },
           errors: function(errors) {
             module.debug('Adding form error messages', errors);
+            module.set.error();
             $message
               .html( settings.templates.error(errors) )
             ;
@@ -1059,9 +1126,9 @@ $.fn.form = function(parameters) {
         },
 
         remove: {
-          prompt: function(field) {
+          prompt: function(identifier) {
             var
-              $field      = module.get.field(field.identifier),
+              $field      = module.get.field(identifier),
               $fieldGroup = $field.closest($group),
               $prompt     = $fieldGroup.children(selector.prompt)
             ;
@@ -1069,7 +1136,7 @@ $.fn.form = function(parameters) {
               .removeClass(className.error)
             ;
             if(settings.inline && $prompt.is(':visible')) {
-              module.verbose('Removing prompt for field', field);
+              module.verbose('Removing prompt for field', identifier);
               if(settings.transition && $.fn.transition !== undefined && $module.transition('is supported')) {
                 $prompt.transition(settings.transition + ' out', settings.duration, function() {
                   $prompt.remove();
@@ -1178,8 +1245,9 @@ $.fn.form = function(parameters) {
 
         validate: {
 
-          form: function(event) {
+          form: function(event, ignoreCallbacks) {
             var
+              values = module.get.values(),
               apiRequest
             ;
 
@@ -1193,7 +1261,9 @@ $.fn.form = function(parameters) {
             if( module.is.valid() ) {
               module.debug('Form has no validation errors, submitting');
               module.set.success();
-              return settings.onSuccess.call(element, event);
+              if(ignoreCallbacks !== true) {
+                return settings.onSuccess.call(element, event, values);
+              }
             }
             else {
               module.debug('Form has errors');
@@ -1205,41 +1275,48 @@ $.fn.form = function(parameters) {
               if($module.data('moduleApi') !== undefined) {
                 event.stopImmediatePropagation();
               }
-              return settings.onFailure.call(element, formErrors);
+              if(ignoreCallbacks !== true) {
+                return settings.onFailure.call(element, formErrors, values);
+              }
             }
           },
 
           // takes a validation object and returns whether field passes validation
-          field: function(field) {
+          field: function(field, fieldName) {
             var
-              $field      = module.get.field(field.identifier),
+              identifier  = field.identifier || fieldName,
+              $field      = module.get.field(identifier),
               fieldValid  = true,
               fieldErrors = []
             ;
+            if(!field.identifier) {
+              module.debug('Using field name as identifier', identifier);
+              field.identifier = identifier;
+            }
             if($field.prop('disabled')) {
-              module.debug('Field is disabled. Skipping', field.identifier);
+              module.debug('Field is disabled. Skipping', identifier);
               fieldValid = true;
             }
             else if(field.optional && $.trim($field.val()) === ''){
-              module.debug('Field is optional and empty. Skipping', field.identifier);
+              module.debug('Field is optional and empty. Skipping', identifier);
               fieldValid = true;
             }
             else if(field.rules !== undefined) {
               $.each(field.rules, function(index, rule) {
-                if( module.has.field(field.identifier) && !( module.validate.rule(field, rule) ) ) {
-                  module.debug('Field is invalid', field.identifier, rule.type);
-                  fieldErrors.push(rule.prompt);
+                if( module.has.field(identifier) && !( module.validate.rule(field, rule) ) ) {
+                  module.debug('Field is invalid', identifier, rule.type);
+                  fieldErrors.push(module.get.prompt(rule, field));
                   fieldValid = false;
                 }
               });
             }
             if(fieldValid) {
-              module.remove.prompt(field, fieldErrors);
+              module.remove.prompt(identifier, fieldErrors);
               settings.onValid.call($field);
             }
             else {
               formErrors = formErrors.concat(fieldErrors);
-              module.add.prompt(field.identifier, fieldErrors);
+              module.add.prompt(identifier, fieldErrors);
               settings.onInvalid.call($field, fieldErrors);
               return false;
             }
@@ -1247,42 +1324,26 @@ $.fn.form = function(parameters) {
           },
 
           // takes validation rule and returns whether field passes rule
-          rule: function(field, validation) {
+          rule: function(field, rule) {
             var
-              $field        = module.get.field(field.identifier),
-              type          = validation.type,
-              value         = $field.val(),
-              bracket       = type.match(settings.regExp.bracket),
-              isValid       = true,
-              rule,
-              ancillary,
-              functionType
+              $field       = module.get.field(field.identifier),
+              type         = rule.type,
+              value        = $field.val(),
+              isValid      = true,
+              ancillary    = module.get.ancillaryValue(rule),
+              ruleName     = module.get.ruleName(rule),
+              ruleFunction = settings.rules[ruleName]
             ;
+            if( !$.isFunction(ruleFunction) ) {
+              module.error(error.noRule, ruleName);
+              return;
+            }
             // cast to string avoiding encoding special values
             value = (value === undefined || value === '' || value === null)
               ? ''
               : $.trim(value + '')
             ;
-            // if bracket notation is used, pass in extra parameters
-            if(bracket) {
-              ancillary    = '' + bracket[1];
-              functionType = type.replace(bracket[0], '');
-              rule         = settings.rules[functionType];
-              if( !$.isFunction(rule) ) {
-                module.error(error.noRule, functionType);
-                return;
-              }
-              isValid = rule.call($field, value, ancillary);
-            }
-            else {
-              rule = settings.rules[type];
-              if( !$.isFunction(rule) ) {
-                module.error(error.noRule, type);
-                return;
-              }
-              isValid = rule.call($field, value);
-            }
-            return isValid;
+            return ruleFunction.call($field, value, ancillary);
           }
         },
 
@@ -1485,11 +1546,47 @@ $.fn.form.settings = {
 
   regExp: {
     bracket : /\[(.*)\]/i,
-    escape  : /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g,
+    decimal : /^\-?\d*(\.\d+)?$/,
     email   : "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?",
-    integer : /^\-?\d+$/,
+    escape  : /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g,
     flags   : /^\/(.*)\/(.*)?/,
+    integer : /^\-?\d+$/,
+    number  : /^\-?\d*(\.\d+)?$/,
     url     : /(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/i
+  },
+
+  text: {
+    unspecifiedRule  : 'Please enter a valid value',
+    unspecifiedField : 'This field'
+  },
+
+  prompt: {
+    empty                : '{name} must have a value',
+    checked              : '{name} must be checked',
+    email                : '{name} must be a valid e-mail',
+    url                  : '{name} must be a valid url',
+    regExp               : '{name} is not formatted correctly',
+    integer              : '{name} must be an integer',
+    decimal              : '{name} must be a decimal number',
+    number               : '{name} must be set to a number',
+    is                   : '{name} must be "{ruleValue}"',
+    isExactly            : '{name} must be exactly "{ruleValue}"',
+    not                  : '{name} cannot be set to "{ruleValue}"',
+    notExactly           : '{name} cannot be set to exactly "{ruleValue}"',
+    contain              : '{name} cannot contain "{ruleValue}"',
+    containExactly       : '{name} cannot contain exactly "{ruleValue}"',
+    doesntContain        : '{name} must contain  "{ruleValue}"',
+    doesntContainExactly : '{name} must contain exactly "{ruleValue}"',
+    minLength            : '{name} must be at least {ruleValue} characters',
+    length               : '{name} must be at least {ruleValue} characters',
+    exactLength          : '{name} must be exactly {ruleValue} characters',
+    maxLength            : '{name} cannot be longer than {ruleValue} characters',
+    match                : '{name} must match {ruleValue} field',
+    different            : '{name} must have a different value than {ruleValue} field',
+    creditCard           : '{name} must be a valid credit card number',
+    minCount             : '{name} must have at least {ruleValue} choices',
+    exactCount           : '{name} must have exactly {ruleValue} choices',
+    maxCount             : '{name} must have {ruleValue} or less choices'
   },
 
   selector : {
@@ -1515,10 +1612,10 @@ $.fn.form.settings = {
   },
 
   error: {
-    oldSyntax  : 'Starting in 2.0 forms now only take a single settings object. Validation settings converted to new syntax automatically.',
     identifier : 'You must specify a string identifier for each field',
+    method     : 'The method you called is not defined.',
     noRule     : 'There is no rule matching the one you specified',
-    method     : 'The method you called is not defined.'
+    oldSyntax  : 'Starting in 2.0 forms now only take a single settings object. Validation settings converted to new syntax automatically.'
   },
 
   templates: {
@@ -1621,6 +1718,15 @@ $.fn.form.settings = {
       );
     },
 
+    // is valid number (with decimal)
+    decimal: function(value) {
+      return $.fn.form.settings.regExp.decimal.test(value);
+    },
+
+    // is valid number
+    number: function(value) {
+      return $.fn.form.settings.regExp.number.test(value);
+    },
 
     // is value (case insensitive)
     is: function(value, text) {
@@ -1767,14 +1873,108 @@ $.fn.form.settings = {
       ;
     },
 
-    exactCount: function(value, exactCount) {
-      if(exactCount == 0) {
-        return (value === '');
+    creditCard: function(cardNumber, cardTypes) {
+      var
+        cards = {
+          visa: {
+            pattern : /^4/,
+            length  : [16]
+          },
+          amex: {
+            pattern : /^3[47]/,
+            length  : [15]
+          },
+          mastercard: {
+            pattern : /^5[1-5]/,
+            length  : [16]
+          },
+          discover: {
+            pattern : /^(6011|622(12[6-9]|1[3-9][0-9]|[2-8][0-9]{2}|9[0-1][0-9]|92[0-5]|64[4-9])|65)/,
+            length  : [16]
+          },
+          unionPay: {
+            pattern : /^(62|88)/,
+            length  : [16, 17, 18, 19]
+          },
+          jcb: {
+            pattern : /^35(2[89]|[3-8][0-9])/,
+            length  : [16]
+          },
+          maestro: {
+            pattern : /^(5018|5020|5038|6304|6759|676[1-3])/,
+            length  : [12, 13, 14, 15, 16, 17, 18, 19]
+          },
+          dinersClub: {
+            pattern : /^(30[0-5]|^36)/,
+            length  : [14]
+          },
+          laser: {
+            pattern : /^(6304|670[69]|6771)/,
+            length  : [16, 17, 18, 19]
+          },
+          visaElectron: {
+            pattern : /^(4026|417500|4508|4844|491(3|7))/,
+            length  : [16]
+          }
+        },
+        valid         = {},
+        validCard     = false,
+        requiredTypes = (typeof cardTypes == 'string')
+          ? cardTypes.split(',')
+          : false,
+        unionPay,
+        validation
+      ;
+
+      if(typeof cardNumber !== 'string' || cardNumber.length === 0) {
+        return;
       }
-      if(exactCount == 1) {
-        return (value !== '' && value.search(',') === -1);
+
+      // verify card types
+      if(requiredTypes) {
+        $.each(requiredTypes, function(index, type){
+          // verify each card type
+          validation = cards[type];
+          if(validation) {
+            valid = {
+              length  : ($.inArray(cardNumber.length, validation.length) !== -1),
+              pattern : (cardNumber.search(validation.pattern) !== -1)
+            };
+            if(valid.length && valid.pattern) {
+              validCard = true;
+            }
+          }
+        });
+
+        if(!validCard) {
+          return false;
+        }
       }
-      return (value.split(',').length == exactCount);
+
+      // skip luhn for UnionPay
+      unionPay = {
+        number  : ($.inArray(cardNumber.length, cards.unionPay.length) !== -1),
+        pattern : (cardNumber.search(cards.unionPay.pattern) !== -1)
+      };
+      if(unionPay.number && unionPay.pattern) {
+        return true;
+      }
+
+      // verify luhn, adapted from  <https://gist.github.com/2134376>
+      var
+        length        = cardNumber.length,
+        multiple      = 0,
+        producedValue = [
+          [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+          [0, 2, 4, 6, 8, 1, 3, 5, 7, 9]
+        ],
+        sum           = 0
+      ;
+      while (length--) {
+        sum += producedValue[multiple][parseInt(cardNumber.charAt(length), 10)];
+        multiple ^= 1;
+      }
+      return (sum % 10 === 0 && sum > 0);
     },
 
     minCount: function(value, minCount) {
@@ -1785,6 +1985,16 @@ $.fn.form.settings = {
         return (value !== '');
       }
       return (value.split(',').length >= minCount);
+    },
+
+    exactCount: function(value, exactCount) {
+      if(exactCount == 0) {
+        return (value === '');
+      }
+      if(exactCount == 1) {
+        return (value !== '' && value.search(',') === -1);
+      }
+      return (value.split(',').length == exactCount);
     },
 
     maxCount: function(value, maxCount) {
@@ -1803,7 +2013,7 @@ $.fn.form.settings = {
 })( jQuery, window , document );
 
 /*!
- * # Semantic UI 2.1.0 - Accordion
+ * # Semantic UI 2.1.4 - Accordion
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -2400,7 +2610,7 @@ $.extend( $.easing, {
 
 
 /*!
- * # Semantic UI 2.1.0 - Checkbox
+ * # Semantic UI 2.1.4 - Checkbox
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -3205,7 +3415,7 @@ $.fn.checkbox.settings = {
 })( jQuery, window , document );
 
 /*!
- * # Semantic UI 2.1.0 - Dimmer
+ * # Semantic UI 2.1.4 - Dimmer
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -3898,7 +4108,7 @@ $.fn.dimmer.settings = {
 
 })( jQuery, window , document );
 /*!
- * # Semantic UI 2.1.0 - Dropdown
+ * # Semantic UI 2.1.4 - Dropdown
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -3938,6 +4148,7 @@ $.fn.dropdown = function(parameters) {
 
         className       = settings.className,
         message         = settings.message,
+        fields          = settings.fields,
         metadata        = settings.metadata,
         namespace       = settings.namespace,
         regExp          = settings.regExp,
@@ -4079,10 +4290,11 @@ $.fn.dropdown = function(parameters) {
             ;
             $.each(values, function(index, value) {
               if(module.get.item(value) === false) {
-                html         = settings.templates.addition(value);
+                html         = settings.templates.addition( module.add.variables(message.addResult, value) );
                 $userChoice  = $('<div />')
                   .html(html)
-                  .data(metadata.value, value)
+                  .attr('data-' + metadata.value, value)
+                  .attr('data-' + metadata.text, value)
                   .addClass(className.addition)
                   .addClass(className.item)
                 ;
@@ -4218,6 +4430,10 @@ $.fn.dropdown = function(parameters) {
               if($input.is('[multiple]')) {
                 module.set.multiple();
               }
+              if ($input.prop('disabled')) {
+                module.debug('Disabling dropdown')
+                $module.addClass(className.disabled)
+              }
               $input
                 .removeAttr('class')
                 .detach()
@@ -4227,7 +4443,7 @@ $.fn.dropdown = function(parameters) {
             module.refresh();
           },
           menu: function(values) {
-            $menu.html( templates.menu( values ));
+            $menu.html( templates.menu(values, fields));
             $item = $menu.find(selector.item);
           },
           reference: function() {
@@ -4623,7 +4839,6 @@ $.fn.dropdown = function(parameters) {
               })
             ;
           }
-
           module.debug('Showing only matched items', searchTerm);
           module.remove.filteredItem();
           $item
@@ -4719,7 +4934,7 @@ $.fn.dropdown = function(parameters) {
               module.hide();
             }
           },
-          // prevents focus callback from occuring on mousedown
+          // prevents focus callback from occurring on mousedown
           mousedown: function() {
             activated = true;
           },
@@ -5046,6 +5261,7 @@ $.fn.dropdown = function(parameters) {
                 hasSubMenu           = ($subMenu.length> 0),
                 hasSelectedItem      = ($selectedItem.length > 0),
                 selectedIsSelectable = ($selectedItem.not(selector.unselectable).length > 0),
+                delimiterPressed     = (pressedKey == keys.delimiter && settings.allowAdditions && module.is.multiple()),
                 $nextItem,
                 isSubMenuItem,
                 newIndex
@@ -5055,7 +5271,7 @@ $.fn.dropdown = function(parameters) {
               if( module.is.visible() ) {
 
                 // enter (select or open sub-menu)
-                if(pressedKey == keys.enter || pressedKey == keys.delimiter) {
+                if(pressedKey == keys.enter || delimiterPressed) {
                   if(pressedKey == keys.enter && hasSelectedItem && hasSubMenu && !settings.allowCategorySelection) {
                     module.verbose('Pressed enter on unselectable category, opening sub menu');
                     pressedKey = keys.rightArrow;
@@ -5172,7 +5388,7 @@ $.fn.dropdown = function(parameters) {
               }
               else {
                 // delimiter key
-                if(pressedKey == keys.delimiter) {
+                if(delimiterPressed) {
                   event.preventDefault();
                 }
                 // down arrow (open menu)
@@ -5462,10 +5678,10 @@ $.fn.dropdown = function(parameters) {
               return false;
             }
             return ($choice.data(metadata.value) !== undefined)
-              ? $choice.data(metadata.value)
+              ? String( $choice.data(metadata.value) )
               : (typeof choiceText === 'string')
                 ? $.trim(choiceText.toLowerCase())
-                : choiceText
+                : String(choiceText)
             ;
           },
           inputEvent: function() {
@@ -5588,7 +5804,7 @@ $.fn.dropdown = function(parameters) {
                     return;
                   }
                   if(isMultiple) {
-                    if($.inArray(optionValue.toString(), value) !== -1 || $.inArray(optionText, value) !== -1) {
+                    if($.inArray( String(optionValue), value) !== -1 || $.inArray(optionText, value) !== -1) {
                       $selectedItem = ($selectedItem)
                         ? $selectedItem.add($choice)
                         : $choice
@@ -5603,7 +5819,7 @@ $.fn.dropdown = function(parameters) {
                     }
                   }
                   else {
-                    if( optionValue.toString() == value.toString() || optionText == value) {
+                    if( String(optionValue) == String(value) || optionText == value) {
                       module.verbose('Found select item by value', optionValue, value);
                       $selectedItem = $choice;
                       return true;
@@ -5918,6 +6134,14 @@ $.fn.dropdown = function(parameters) {
             module.verbose('Setting initial load');
             initialLoad = true;
           },
+          activeItem: function($item) {
+            if( settings.allowAdditions && $item.filter(selector.addition).length > 0 ) {
+              $item.addClass(className.filtered);
+            }
+            else {
+              $item.addClass(className.active);
+            }
+          },
           scrollPosition: function($item, forceScroll) {
             var
               edgeTolerance = 5,
@@ -6043,8 +6267,8 @@ $.fn.dropdown = function(parameters) {
               hasInput     = ($input.length > 0),
               isAddition   = !module.has.value(value),
               currentValue = module.get.values(),
-              stringValue  = (typeof value == 'number')
-                ? value.toString()
+              stringValue  = (value !== undefined)
+                ? String(value)
                 : value,
               newValue
             ;
@@ -6143,14 +6367,14 @@ $.fn.dropdown = function(parameters) {
                     if(settings.useLabels) {
                       module.add.value(selectedValue, selectedText, $selected);
                       module.add.label(selectedValue, selectedText, shouldAnimate);
-                      $selected.addClass(className.active);
+                      module.set.activeItem($selected);
                       module.filterActive();
                       module.select.nextAvailable($selectedItem);
                     }
                     else {
                       module.add.value(selectedValue, selectedText, $selected);
                       module.set.text(module.add.variables(message.count));
-                      $selected.addClass(className.active);
+                      module.set.activeItem($selected);
                     }
                   }
                   else if(!isFiltered) {
@@ -6263,7 +6487,8 @@ $.fn.dropdown = function(parameters) {
           userSuggestion: function(value) {
             var
               $addition         = $menu.children(selector.addition),
-              alreadyHasValue   = module.get.item(value),
+              $existingItem     = module.get.item(value),
+              alreadyHasValue   = $existingItem && $existingItem.not(selector.addition).length,
               hasUserSuggestion = $addition.length > 0,
               html
             ;
@@ -6278,10 +6503,11 @@ $.fn.dropdown = function(parameters) {
               .removeClass(className.selected)
             ;
             if(hasUserSuggestion) {
-              html = settings.templates.addition(value);
+              html = settings.templates.addition( module.add.variables(message.addResult, value) );
               $addition
                 .html(html)
-                .data(metadata.value, value)
+                .attr('data-' + metadata.value, value)
+                .attr('data-' + metadata.text, value)
                 .removeClass(className.filtered)
                 .addClass(className.selected)
               ;
@@ -6296,7 +6522,7 @@ $.fn.dropdown = function(parameters) {
               module.verbose('Adding item choice to menu corresponding with user choice addition', $addition);
             }
           },
-          variables: function(message) {
+          variables: function(message, term) {
             var
               hasCount    = (message.search('{count}') !== -1),
               hasMaxCount = (message.search('{maxCount}') !== -1),
@@ -6315,7 +6541,7 @@ $.fn.dropdown = function(parameters) {
               message = message.replace('{maxCount}', settings.maxSelections);
             }
             if(hasTerm) {
-              query   = module.get.query();
+              query   = term || module.get.query();
               message = message.replace('{term}', query);
             }
             return message;
@@ -6448,7 +6674,12 @@ $.fn.dropdown = function(parameters) {
                   }
                   else {
                     module.remove.value(selectedValue, selectedText, $selected);
-                    module.set.text(module.add.variables(message.count));
+                    if(module.get.selectionCount() === 0) {
+                      module.set.placeholderText();
+                    }
+                    else {
+                      module.set.text(module.add.variables(message.count));
+                    }
                   }
                 }
                 else {
@@ -6521,8 +6752,8 @@ $.fn.dropdown = function(parameters) {
               .each(function(){
                 var
                   value       = $(this).data(metadata.value),
-                  stringValue = (typeof value == 'number')
-                    ? value.toString()
+                  stringValue = (value !== undefined)
+                    ? String(value)
                     : value,
                   isUserValue = module.is.userValue(stringValue)
                 ;
@@ -7112,7 +7343,7 @@ $.fn.dropdown.settings = {
 
   maxSelections          : false,      // When set to a number limits the number of selections to this count
   useLabels              : true,       // whether multiple select should filter currently active selections from choices
-  delimiter              : ',',        // when multiselect uses normal <input> the values will be delmited with this character
+  delimiter              : ',',        // when multiselect uses normal <input> the values will be delimited with this character
 
   showOnFocus            : true,       // show menu on focus
   allowTab               : true,       // add tabindex to element
@@ -7186,6 +7417,13 @@ $.fn.dropdown.settings = {
     value           : 'value'
   },
 
+  // property names for remote query
+  fields: {
+    values : 'values', // grouping for all dropdown values
+    name   : 'name',   // displayed dropdown text
+    value  : 'value'   // actual dropdown value
+  },
+
   selector : {
     addition     : '.addition',
     dropdown     : '.ui.dropdown',
@@ -7256,13 +7494,13 @@ $.fn.dropdown.settings.templates = {
   },
 
   // generates just menu from select
-  menu: function(response) {
+  menu: function(response, fields) {
     var
       values = response.values || {},
       html   = ''
     ;
-    $.each(response.values, function(index, option) {
-      html += '<div class="item" data-value="' + option.value + '">' + option.name + '</div>';
+    $.each(response[fields.values], function(index, option) {
+      html += '<div class="item" data-value="' + option[fields.value] + '">' + option[fields.name] + '</div>';
     });
     return html;
   },
@@ -7288,7 +7526,7 @@ $.fn.dropdown.settings.templates = {
 })( jQuery, window , document );
 
 /*!
- * # Semantic UI 2.1.0 - Video
+ * # Semantic UI 2.1.4 - Video
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -7916,7 +8154,7 @@ $.fn.embed.settings = {
   templates: {
     iframe : function(url, parameters) {
       return ''
-        + '<iframe src="' + url + '?=' + parameters + '"'
+        + '<iframe src="' + url + '?' + parameters + '"'
         + ' width="100%" height="100%"'
         + ' frameborder="0" scrolling="no" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>'
       ;
@@ -7948,7 +8186,7 @@ $.fn.embed.settings = {
 })( jQuery, window , document );
 
 /*!
- * # Semantic UI 2.1.0 - Modal
+ * # Semantic UI 2.1.4 - Modal
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -8838,7 +9076,7 @@ $.fn.modal.settings = {
 })( jQuery, window , document );
 
 /*!
- * # Semantic UI 2.1.0 - Nag
+ * # Semantic UI 2.1.4 - Nag
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -9033,6 +9271,10 @@ $.fn.nag = function(parameters) {
               window.localStorage.setItem(key, value);
               module.debug('Value stored using local storage', key, value);
             }
+            else if(settings.storageMethod == 'sessionstorage' && window.sessionStorage !== undefined) {
+              window.sessionStorage.setItem(key, value);
+              module.debug('Value stored using session storage', key, value);
+            }
             else if($.cookie !== undefined) {
               $.cookie(key, value, options);
               module.debug('Value stored using cookie', key, value, options);
@@ -9048,6 +9290,9 @@ $.fn.nag = function(parameters) {
             ;
             if(settings.storageMethod == 'localstorage' && window.localStorage !== undefined) {
               storedValue = window.localStorage.getItem(key);
+            }
+            else if(settings.storageMethod == 'sessionstorage' && window.sessionStorage !== undefined) {
+              storedValue = window.sessionStorage.getItem(key);
             }
             // get by cookie
             else if($.cookie !== undefined) {
@@ -9065,8 +9310,11 @@ $.fn.nag = function(parameters) {
             var
               options = module.get.storageOptions()
             ;
-            if(settings.storageMethod == 'local' && window.store !== undefined) {
+            if(settings.storageMethod == 'localstorage' && window.localStorage !== undefined) {
               window.localStorage.removeItem(key);
+            }
+            else if(settings.storageMethod == 'sessionstorage' && window.sessionStorage !== undefined) {
+              window.sessionStorage.removeItem(key);
             }
             // store by cookie
             else if($.cookie !== undefined) {
@@ -9315,7 +9563,7 @@ $.fn.nag.settings = {
 })( jQuery, window , document );
 
 /*!
- * # Semantic UI 2.1.0 - Popup
+ * # Semantic UI 2.1.4 - Popup
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -9440,6 +9688,9 @@ $.fn.popup = function(parameters) {
             module.debug('Setting page as offset parent');
             $offsetParent = $body;
           }
+          if( module.get.variation() ) {
+            module.set.variation();
+          }
         },
 
         reposition: function() {
@@ -9510,7 +9761,6 @@ $.fn.popup = function(parameters) {
         create: function() {
           var
             html      = module.get.html(),
-            variation = module.get.variation(),
             title     = module.get.title(),
             content   = module.get.content()
           ;
@@ -9525,15 +9775,9 @@ $.fn.popup = function(parameters) {
             }
             $popup = $('<div/>')
               .addClass(className.popup)
-              .addClass(variation)
               .data(metadata.activator, $module)
               .html(html)
             ;
-            if(variation) {
-              $popup
-                .addClass(variation)
-              ;
-            }
             if(settings.inline) {
               module.verbose('Inserting popup element inline', $popup);
               $popup
@@ -9547,6 +9791,8 @@ $.fn.popup = function(parameters) {
               ;
             }
             module.refresh();
+            module.set.variation();
+
             if(settings.hoverable) {
               module.bind.popup();
             }
@@ -9660,12 +9906,12 @@ $.fn.popup = function(parameters) {
         },
 
         removePopup: function() {
-          module.debug('Removing popup', $popup);
           if( module.has.popup() && !settings.popup) {
+            module.debug('Removing popup', $popup);
             $popup.remove();
             $popup = undefined;
+            settings.onRemove.call($popup, element);
           }
-          settings.onRemove.call($popup, element);
         },
 
         save: {
@@ -10169,6 +10415,14 @@ $.fn.popup = function(parameters) {
             $popup.css('width', calculations.container.width);
           },
 
+          variation: function(variation) {
+            variation = variation || module.get.variation();
+            if(variation && module.has.popup() ) {
+              module.verbose('Adding variation to popup', variation);
+              $popup.addClass(variation);
+            }
+          },
+
           visible: function() {
             $module.addClass(className.visible);
           }
@@ -10177,6 +10431,13 @@ $.fn.popup = function(parameters) {
         remove: {
           loading: function() {
             $popup.removeClass(className.loading);
+          },
+          variation: function(variation) {
+            variation = variation || module.get.variation();
+            if(variation) {
+              module.verbose('Removing variation', variation);
+              $popup.removeClass(variation);
+            }
           },
           visible: function() {
             $module.removeClass(className.visible);
@@ -10703,7 +10964,7 @@ $.fn.popup.settings = {
 })( jQuery, window , document );
 
 /*!
- * # Semantic UI 2.1.0 - Progress
+ * # Semantic UI 2.1.4 - Progress
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -11497,7 +11758,7 @@ $.fn.progress.settings = {
 
 })( jQuery, window , document );
 /*!
- * # Semantic UI 2.1.0 - Rating
+ * # Semantic UI 2.1.4 - Rating
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -11973,7 +12234,7 @@ $.fn.rating.settings = {
 })( jQuery, window , document );
 
 /*!
- * # Semantic UI 2.1.0 - Search
+ * # Semantic UI 2.1.4 - Search
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -12010,6 +12271,7 @@ $.fn.search = function(parameters) {
         className       = settings.className,
         metadata        = settings.metadata,
         regExp          = settings.regExp,
+        fields          = settings.fields,
         selector        = settings.selector,
         error           = settings.error,
         namespace       = settings.namespace,
@@ -12100,7 +12362,9 @@ $.fn.search = function(parameters) {
             module.set.focus();
             if( module.has.minimumCharacters() ) {
               module.query();
-              module.showResults();
+              if( module.can.show() ) {
+                module.showResults();
+              }
             }
           },
           blur: function(event) {
@@ -12262,6 +12526,9 @@ $.fn.search = function(parameters) {
           useAPI: function() {
             return $.fn.api !== undefined;
           },
+          show: function() {
+            return module.is.focused() && !module.is.visible() && !module.is.empty();
+          },
           transition: function() {
             return settings.transition && $.fn.transition !== undefined && $module.transition('is supported');
           }
@@ -12318,7 +12585,7 @@ $.fn.search = function(parameters) {
               $.each(results, function(index, category) {
                 if($.isArray(category.results)) {
                   result = module.search.object(value, category.results, lookupFields)[0];
-                  // dont continue searching if a result is found
+                  // don't continue searching if a result is found
                   if(result) {
                     return false;
                   }
@@ -12540,14 +12807,14 @@ $.fn.search = function(parameters) {
             ;
             module.verbose('Parsing server response', response);
             if(response !== undefined) {
-              if(searchTerm !== undefined && response.results !== undefined) {
+              if(searchTerm !== undefined && response[fields.results] !== undefined) {
                 module.addResults(searchHTML);
-                module.inject.id(response.results);
+                module.inject.id(response[fields.results]);
                 module.write.cache(searchTerm, {
                   html    : searchHTML,
-                  results : response.results
+                  results : response[fields.results]
                 });
-                module.save.results(response.results);
+                module.save.results(response[fields.results]);
               }
             }
           }
@@ -12726,11 +12993,13 @@ $.fn.search = function(parameters) {
           $results
             .html(html)
           ;
-          module.showResults();
+          if( module.can.show() ) {
+            module.showResults();
+          }
         },
 
         showResults: function() {
-          if( !module.is.visible() && module.is.focused() && !module.is.empty() ) {
+          if(!module.is.visible()) {
             if( module.can.transition() ) {
               module.debug('Showing results with css animations');
               $results
@@ -12782,8 +13051,8 @@ $.fn.search = function(parameters) {
           module.debug('Generating html from response', response);
           var
             template       = settings.templates[settings.type],
-            isProperObject = ($.isPlainObject(response.results) && !$.isEmptyObject(response.results)),
-            isProperArray  = ($.isArray(response.results) && response.results.length > 0),
+            isProperObject = ($.isPlainObject(response[fields.results]) && !$.isEmptyObject(response[fields.results])),
+            isProperArray  = ($.isArray(response[fields.results]) && response[fields.results].length > 0),
             html           = ''
           ;
           if(isProperObject || isProperArray ) {
@@ -12794,11 +13063,11 @@ $.fn.search = function(parameters) {
                 }
               }
               else {
-                response.results = response.results.slice(0, settings.maxResults);
+                response[fields.results] = response[fields.results].slice(0, settings.maxResults);
               }
             }
             if($.isFunction(template)) {
-              html = template(response);
+              html = template(response, fields);
             }
             else {
               module.error(error.noTemplate, false);
@@ -13023,6 +13292,9 @@ $.fn.search.settings = {
   ],
   // fields to search
 
+  displayField   : '',
+  // field to display in standard results template
+
   searchFullText : true,
   // whether to include fuzzy results in local search
 
@@ -13087,6 +13359,21 @@ $.fn.search.settings = {
     beginsWith : '(?:\s|^)'
   },
 
+  // maps api response attributes to internal representation
+  fields: {
+    categories      : 'results',     // array of categories (category view)
+    categoryName    : 'name',        // name of category (category view)
+    categoryResults : 'results',     // array of results (category view)
+    description     : 'description', // result description
+    image           : 'image',       // result image
+    price           : 'price',       // result price
+    results         : 'results',     // array of results (standard)
+    title           : 'title',       // result title
+    action          : 'action',      // "view more" object name
+    actionText      : 'text',        // "view more" text
+    actionURL       : 'url'          // "view more" url
+  },
+
   selector : {
     prompt       : '.prompt',
     searchButton : '.search.button',
@@ -13140,95 +13427,98 @@ $.fn.search.settings = {
       }
       return html;
     },
-    category: function(response) {
+    category: function(response, fields) {
       var
         html = '',
         escape = $.fn.search.settings.templates.escape
       ;
-      if(response.results !== undefined) {
+      if(response[fields.categoryResults] !== undefined) {
+
         // each category
-        $.each(response.results, function(index, category) {
-          if(category.results !== undefined && category.results.length > 0) {
-            html  += ''
-              + '<div class="category">'
-              + '<div class="name">' + category.name + '</div>'
-            ;
+        $.each(response[fields.categoryResults], function(index, category) {
+          if(category[fields.results] !== undefined && category.results.length > 0) {
+
+            html  += '<div class="category">';
+
+            if(category[fields.categoryName] !== undefined) {
+              html += '<div class="name">' + category[fields.categoryName] + '</div>';
+            }
+
             // each item inside category
             $.each(category.results, function(index, result) {
-              html  += '<div class="result">';
-              if(result.url) {
-                html  += '<a href="' + result.url + '"></a>';
+              if(response[fields.url]) {
+                html  += '<a class="result" href="' + response[fields.url] + '">';
               }
-              if(result.image !== undefined) {
-                result.image = escape(result.image);
+              else {
+                html  += '<a class="result">';
+              }
+              if(result[fields.image] !== undefined) {
                 html += ''
                   + '<div class="image">'
-                  + ' <img src="' + result.image + '" alt="">'
+                  + ' <img src="' + result[fields.image] + '">'
                   + '</div>'
                 ;
               }
               html += '<div class="content">';
-              if(result.price !== undefined) {
-                result.price = escape(result.price);
-                html += '<div class="price">' + result.price + '</div>';
+              if(result[fields.price] !== undefined) {
+                html += '<div class="price">' + result[fields.price] + '</div>';
               }
-              if(result.title !== undefined) {
-                result.title = escape(result.title);
-                html += '<div class="title">' + result.title + '</div>';
+              if(result[fields.title] !== undefined) {
+                html += '<div class="title">' + result[fields.title] + '</div>';
               }
-              if(result.description !== undefined) {
-                html += '<div class="description">' + result.description + '</div>';
+              if(result[fields.description] !== undefined) {
+                html += '<div class="description">' + result[fields.description] + '</div>';
               }
               html  += ''
                 + '</div>'
-                + '</div>'
               ;
+              html += '</a>';
             });
             html  += ''
               + '</div>'
             ;
           }
         });
-        if(response.action) {
+        if(response[fields.action]) {
           html += ''
-          + '<a href="' + response.action.url + '" class="action">'
-          +   response.action.text
+          + '<a href="' + response[fields.action][fields.actionURL] + '" class="action">'
+          +   response[fields.action][fields.actionText]
           + '</a>';
         }
         return html;
       }
       return false;
     },
-    standard: function(response) {
+    standard: function(response, fields) {
       var
         html = ''
       ;
-      if(response.results !== undefined) {
+      if(response[fields.results] !== undefined) {
 
         // each result
-        $.each(response.results, function(index, result) {
-          if(result.url) {
-            html  += '<a class="result" href="' + result.url + '">';
+        $.each(response[fields.results], function(index, result) {
+          if(response[fields.url]) {
+            html  += '<a class="result" href="' + response[fields.url] + '">';
           }
           else {
             html  += '<a class="result">';
           }
-          if(result.image !== undefined) {
+          if(result[fields.image] !== undefined) {
             html += ''
               + '<div class="image">'
-              + ' <img src="' + result.image + '">'
+              + ' <img src="' + result[fields.image] + '">'
               + '</div>'
             ;
           }
           html += '<div class="content">';
-          if(result.price !== undefined) {
-            html += '<div class="price">' + result.price + '</div>';
+          if(result[fields.price] !== undefined) {
+            html += '<div class="price">' + result[fields.price] + '</div>';
           }
-          if(result.title !== undefined) {
-            html += '<div class="title">' + result.title + '</div>';
+          if(result[fields.title] !== undefined) {
+            html += '<div class="title">' + result[fields.title] + '</div>';
           }
-          if(result.description !== undefined) {
-            html += '<div class="description">' + result.description + '</div>';
+          if(result[fields.description] !== undefined) {
+            html += '<div class="description">' + result[fields.description] + '</div>';
           }
           html  += ''
             + '</div>'
@@ -13236,10 +13526,10 @@ $.fn.search.settings = {
           html += '</a>';
         });
 
-        if(response.action) {
+        if(response[fields.action]) {
           html += ''
-          + '<a href="' + response.action.url + '" class="action">'
-          +   response.action.text
+          + '<a href="' + response[fields.action][fields.actionURL] + '" class="action">'
+          +   response[fields.action][fields.actionText]
           + '</a>';
         }
         return html;
@@ -13252,7 +13542,7 @@ $.fn.search.settings = {
 })( jQuery, window , document );
 
 /*!
- * # Semantic UI 2.1.0 - Shape
+ * # Semantic UI 2.1.4 - Shape
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -14128,7 +14418,7 @@ $.fn.shape.settings = {
 
 })( jQuery, window , document );
 /*!
- * # Semantic UI 2.1.0 - Sidebar
+ * # Semantic UI 2.1.4 - Sidebar
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -15151,7 +15441,7 @@ $.fn.sidebar.settings = {
 })( jQuery, window , document );
 
 /*!
- * # Semantic UI 2.1.0 - Sticky
+ * # Semantic UI 2.1.4 - Sticky
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -16039,7 +16329,7 @@ $.fn.sticky.settings = {
 })( jQuery, window , document );
 
 /*!
- * # Semantic UI 2.1.0 - Tab
+ * # Semantic UI 2.1.4 - Tab
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -16147,7 +16437,7 @@ $.fn.tab = function(parameters) {
 
         bind: {
           events: function() {
-            // if using $.tab dont add events
+            // if using $.tab don't add events
             if( !$.isWindow( element ) ) {
               module.debug('Attaching tab activation events to element', $module);
               $module
@@ -16649,8 +16939,8 @@ $.fn.tab = function(parameters) {
             tabPath        = tabPath || activeTabPath;
             tabPathArray   = module.utilities.pathToArray(tabPath);
             lastTab        = module.utilities.last(tabPathArray);
-            $fullPathTab   = $tabs.filter('[data-' + metadata.tab + '="' + lastTab + '"]');
-            $simplePathTab = $tabs.filter('[data-' + metadata.tab + '="' + tabPath + '"]');
+            $fullPathTab   = $tabs.filter('[data-' + metadata.tab + '="' + tabPath + '"]');
+            $simplePathTab = $tabs.filter('[data-' + metadata.tab + '="' + lastTab + '"]');
             return ($fullPathTab.length > 0)
               ? $fullPathTab
               : $simplePathTab
@@ -16936,8 +17226,9 @@ $.fn.tab.settings = {
 };
 
 })( jQuery, window , document );
+
 /*!
- * # Semantic UI 2.1.0 - Transition
+ * # Semantic UI 2.1.4 - Transition
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -18010,7 +18301,7 @@ $.fn.transition.settings = {
 })( jQuery, window , document );
 
 /*!
- * # Semantic UI 2.1.0 - API
+ * # Semantic UI 2.1.4 - API
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -18277,12 +18568,18 @@ $.api = $.fn.api = function(parameters) {
 
         },
 
+        should: {
+          removeError: function() {
+            return ( settings.hideError === true || (settings.hideError === 'auto' && !module.is.form()) );
+          }
+        },
+
         is: {
           disabled: function() {
             return ($module.filter(selector.disabled).length > 0);
           },
           form: function() {
-            return $module.is('form');
+            return $module.is('form') || $context.is('form');
           },
           mocked: function() {
             return (settings.mockResponse || settings.mockResponseAsync);
@@ -18573,7 +18870,9 @@ $.api = $.fn.api = function(parameters) {
               if(settings.errorDuration && status !== 'aborted') {
                 module.debug('Adding error state');
                 module.set.error();
-                setTimeout(module.remove.error, settings.errorDuration);
+                if( module.should.removeError() ) {
+                  setTimeout(module.remove.error, settings.errorDuration);
+                }
               }
               module.debug('API Request failed', errorMessage, xhr);
               settings.onFailure.call(context, response, $module, xhr);
@@ -18800,7 +19099,7 @@ $.api = $.fn.api = function(parameters) {
               url = settings.api[action];
             }
             else if( module.is.form() ) {
-              url = $module.attr('action') || false;
+              url = $module.attr('action') || $context.attr('action') || false;
               module.debug('No url or action specified, defaulting to form action', url);
             }
             return url;
@@ -19027,9 +19326,13 @@ $.api.settings = {
   // duration for loading state
   loadingDuration   : 0,
 
+  // whether to hide errors after a period of time
+  hideError         : 'auto',
+
   // duration for error state
   errorDuration     : 2000,
 
+  // whether parameters should be encoded with encodeURIComponent
   encodeParameters  : true,
 
   // API action to use
@@ -19102,7 +19405,7 @@ $.api.settings = {
     missingSerialize  : 'jquery-serialize-object is required to add form data to an existing data object',
     missingURL        : 'No URL specified for api event',
     noReturnedValue   : 'The beforeSend callback must return a settings object, beforeSend ignored.',
-    noStorage         : 'Caching respopnses locally requires session storage',
+    noStorage         : 'Caching responses locally requires session storage',
     parseError        : 'There was an error parsing your request',
     requiredParameter : 'Missing a required URL parameter: ',
     statusMessage     : 'Server gave an error: ',
@@ -19135,7 +19438,7 @@ $.api.settings = {
 })( jQuery, window , document );
 
 /*!
- * # Semantic UI 2.1.0 - State
+ * # Semantic UI 2.1.4 - State
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -19831,7 +20134,7 @@ $.fn.state.settings = {
 })( jQuery, window , document );
 
 /*!
- * # Semantic UI 2.1.0 - Visibility
+ * # Semantic UI 2.1.4 - Visibility
  * http://github.com/semantic-org/semantic-ui/
  *
  *

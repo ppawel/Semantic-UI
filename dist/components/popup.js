@@ -1,5 +1,5 @@
 /*!
- * # Semantic UI 2.1.0 - Popup
+ * # Semantic UI 2.1.4 - Popup
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -124,6 +124,9 @@ $.fn.popup = function(parameters) {
             module.debug('Setting page as offset parent');
             $offsetParent = $body;
           }
+          if( module.get.variation() ) {
+            module.set.variation();
+          }
         },
 
         reposition: function() {
@@ -194,7 +197,6 @@ $.fn.popup = function(parameters) {
         create: function() {
           var
             html      = module.get.html(),
-            variation = module.get.variation(),
             title     = module.get.title(),
             content   = module.get.content()
           ;
@@ -209,15 +211,9 @@ $.fn.popup = function(parameters) {
             }
             $popup = $('<div/>')
               .addClass(className.popup)
-              .addClass(variation)
               .data(metadata.activator, $module)
               .html(html)
             ;
-            if(variation) {
-              $popup
-                .addClass(variation)
-              ;
-            }
             if(settings.inline) {
               module.verbose('Inserting popup element inline', $popup);
               $popup
@@ -231,6 +227,8 @@ $.fn.popup = function(parameters) {
               ;
             }
             module.refresh();
+            module.set.variation();
+
             if(settings.hoverable) {
               module.bind.popup();
             }
@@ -344,12 +342,12 @@ $.fn.popup = function(parameters) {
         },
 
         removePopup: function() {
-          module.debug('Removing popup', $popup);
           if( module.has.popup() && !settings.popup) {
+            module.debug('Removing popup', $popup);
             $popup.remove();
             $popup = undefined;
+            settings.onRemove.call($popup, element);
           }
-          settings.onRemove.call($popup, element);
         },
 
         save: {
@@ -853,6 +851,14 @@ $.fn.popup = function(parameters) {
             $popup.css('width', calculations.container.width);
           },
 
+          variation: function(variation) {
+            variation = variation || module.get.variation();
+            if(variation && module.has.popup() ) {
+              module.verbose('Adding variation to popup', variation);
+              $popup.addClass(variation);
+            }
+          },
+
           visible: function() {
             $module.addClass(className.visible);
           }
@@ -861,6 +867,13 @@ $.fn.popup = function(parameters) {
         remove: {
           loading: function() {
             $popup.removeClass(className.loading);
+          },
+          variation: function(variation) {
+            variation = variation || module.get.variation();
+            if(variation) {
+              module.verbose('Removing variation', variation);
+              $popup.removeClass(variation);
+            }
           },
           visible: function() {
             $module.removeClass(className.visible);

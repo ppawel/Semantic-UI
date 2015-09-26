@@ -23,7 +23,6 @@
 
 @borderRadius: @defaultBorderRadius;
 @transition:
-  background-color @defaultDuration @defaultEasing,
   box-shadow @defaultDuration @defaultEasing,
   border-color @defaultDuration @defaultEasing
 ;
@@ -77,7 +76,7 @@
 @downBoxShadow: none;
 
 /* Focus */
-@focusBorderColor: @selectedBorderColor;
+@focusBorderColor: @focusedFormBorderColor;
 @focusBackground: @background;
 @focusColor: @hoveredTextColor;
 @focusBoxShadow: none;
