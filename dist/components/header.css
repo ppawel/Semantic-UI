@@ -1,9 +1,8 @@
 /*!
- * # Semantic UI 2.1.4 - Header
+ * # Semantic UI 2.2.7 - Header
  * http://github.com/semantic-org/semantic-ui/
  *
  *
- * Copyright 2015 Contributors
  * Released under the MIT license
  * http://opensource.org/licenses/MIT
  *
@@ -38,6 +37,7 @@
 ---------------*/
 
 .ui.header .sub.header {
+  display: block;
   font-weight: normal;
   padding: 0em;
   margin: 0em;
@@ -214,7 +214,7 @@ h5.ui.header .sub.header {
   color: '';
 }
 .ui.small.sub.header {
-  font-size: 0.69230769em;
+  font-size: 0.76923077em;
 }
 .ui.sub.header {
   font-size: 0.84615385em;
@@ -258,6 +258,7 @@ h5.ui.header .sub.header {
 }
 .ui.icon.header .content {
   display: block;
+  padding: 0em;
 }
 .ui.icon.header .circular.icon {
   font-size: 2em;
@@ -294,7 +295,7 @@ h5.ui.header .sub.header {
 --------------------*/
 
 .ui.inverted.header {
-  color: #ffffff;
+  color: #FFFFFF;
 }
 .ui.inverted.header .sub.header {
   color: rgba(255, 255, 255, 0.8);
@@ -322,18 +323,18 @@ h5.ui.header .sub.header {
 /*--- Red ---*/
 
 .ui.red.header {
-  color: #f44336 !important;
+  color: #F44336 !important;
 }
 a.ui.red.header:hover {
   color: #fd2313 !important;
 }
 .ui.red.dividing.header {
-  border-bottom: 2px solid #f44336;
+  border-bottom: 2px solid #F44336;
 }
 
 /* Inverted */
 .ui.inverted.red.header {
-  color: #ff1744 !important;
+  color: #FF1744 !important;
 }
 a.ui.inverted.red.header:hover {
   color: #fc0031 !important;
@@ -342,18 +343,18 @@ a.ui.inverted.red.header:hover {
 /*--- Orange ---*/
 
 .ui.orange.header {
-  color: #ff9800 !important;
+  color: #FF9800 !important;
 }
 a.ui.orange.header:hover {
   color: #e68900 !important;
 }
 .ui.orange.dividing.header {
-  border-bottom: 2px solid #ff9800;
+  border-bottom: 2px solid #FF9800;
 }
 
 /* Inverted */
 .ui.inverted.orange.header {
-  color: #ff9100 !important;
+  color: #FF9100 !important;
 }
 a.ui.inverted.orange.header:hover {
   color: #e68300 !important;
@@ -362,18 +363,18 @@ a.ui.inverted.orange.header:hover {
 /*--- Olive ---*/
 
 .ui.olive.header {
-  color: #b5cc18 !important;
+  color: #B5CC18 !important;
 }
 a.ui.olive.header:hover {
   color: #a7bd0d !important;
 }
 .ui.olive.dividing.header {
-  border-bottom: 2px solid #b5cc18;
+  border-bottom: 2px solid #B5CC18;
 }
 
 /* Inverted */
 .ui.inverted.olive.header {
-  color: #d9e778 !important;
+  color: #D9E778 !important;
 }
 a.ui.inverted.olive.header:hover {
   color: #d8ea5c !important;
@@ -382,18 +383,18 @@ a.ui.inverted.olive.header:hover {
 /*--- Yellow ---*/
 
 .ui.yellow.header {
-  color: #ffeb3b !important;
+  color: #FFEB3B !important;
 }
 a.ui.yellow.header:hover {
   color: #ffe821 !important;
 }
 .ui.yellow.dividing.header {
-  border-bottom: 2px solid #ffeb3b;
+  border-bottom: 2px solid #FFEB3B;
 }
 
 /* Inverted */
 .ui.inverted.yellow.header {
-  color: #ffea00 !important;
+  color: #FFEA00 !important;
 }
 a.ui.inverted.yellow.header:hover {
   color: #e6d300 !important;
@@ -402,18 +403,18 @@ a.ui.inverted.yellow.header:hover {
 /*--- Green ---*/
 
 .ui.green.header {
-  color: #4caf50 !important;
+  color: #4CAF50 !important;
 }
 a.ui.green.header:hover {
   color: #40a244 !important;
 }
 .ui.green.dividing.header {
-  border-bottom: 2px solid #4caf50;
+  border-bottom: 2px solid #4CAF50;
 }
 
 /* Inverted */
 .ui.inverted.green.header {
-  color: #00e676 !important;
+  color: #00E676 !important;
 }
 a.ui.inverted.green.header:hover {
   color: #00cd69 !important;
@@ -433,7 +434,7 @@ a.ui.teal.header:hover {
 
 /* Inverted */
 .ui.inverted.teal.header {
-  color: #1de9b6 !important;
+  color: #1DE9B6 !important;
 }
 a.ui.inverted.teal.header:hover {
   color: #0be1ac !important;
@@ -442,18 +443,18 @@ a.ui.inverted.teal.header:hover {
 /*--- Blue ---*/
 
 .ui.blue.header {
-  color: #2196f3 !important;
+  color: #2196F3 !important;
 }
 a.ui.blue.header:hover {
   color: #028bf9 !important;
 }
 .ui.blue.dividing.header {
-  border-bottom: 2px solid #2196f3;
+  border-bottom: 2px solid #2196F3;
 }
 
 /* Inverted */
 .ui.inverted.blue.header {
-  color: #2979ff !important;
+  color: #2979FF !important;
 }
 a.ui.inverted.blue.header:hover {
   color: #1069ff !important;
@@ -462,18 +463,18 @@ a.ui.inverted.blue.header:hover {
 /*--- Violet ---*/
 
 .ui.violet.header {
-  color: #6435c9 !important;
+  color: #6435C9 !important;
 }
 a.ui.violet.header:hover {
   color: #5829bb !important;
 }
 .ui.violet.dividing.header {
-  border-bottom: 2px solid #6435c9;
+  border-bottom: 2px solid #6435C9;
 }
 
 /* Inverted */
 .ui.inverted.violet.header {
-  color: #a291fb !important;
+  color: #A291FB !important;
 }
 a.ui.inverted.violet.header:hover {
   color: #8a73ff !important;
@@ -482,18 +483,18 @@ a.ui.inverted.violet.header:hover {
 /*--- Purple ---*/
 
 .ui.purple.header {
-  color: #9c27b0 !important;
+  color: #9C27B0 !important;
 }
 a.ui.purple.header:hover {
   color: #8e1ca1 !important;
 }
 .ui.purple.dividing.header {
-  border-bottom: 2px solid #9c27b0;
+  border-bottom: 2px solid #9C27B0;
 }
 
 /* Inverted */
 .ui.inverted.purple.header {
-  color: #d500f9 !important;
+  color: #D500F9 !important;
 }
 a.ui.inverted.purple.header:hover {
   color: #bf00e0 !important;
@@ -502,18 +503,18 @@ a.ui.inverted.purple.header:hover {
 /*--- Pink ---*/
 
 .ui.pink.header {
-  color: #e91e63 !important;
+  color: #E91E63 !important;
 }
 a.ui.pink.header:hover {
   color: #e20b54 !important;
 }
 .ui.pink.dividing.header {
-  border-bottom: 2px solid #e91e63;
+  border-bottom: 2px solid #E91E63;
 }
 
 /* Inverted */
 .ui.inverted.pink.header {
-  color: #f50057 !important;
+  color: #F50057 !important;
 }
 a.ui.inverted.pink.header:hover {
   color: #dc004e !important;
@@ -522,18 +523,18 @@ a.ui.inverted.pink.header:hover {
 /*--- Brown ---*/
 
 .ui.brown.header {
-  color: #a5673f !important;
+  color: #A5673F !important;
 }
 a.ui.brown.header:hover {
   color: #975b33 !important;
 }
 .ui.brown.dividing.header {
-  border-bottom: 2px solid #a5673f;
+  border-bottom: 2px solid #A5673F;
 }
 
 /* Inverted */
 .ui.inverted.brown.header {
-  color: #d67c1c !important;
+  color: #D67C1C !important;
 }
 a.ui.inverted.brown.header:hover {
   color: #c86f11 !important;
@@ -542,18 +543,18 @@ a.ui.inverted.brown.header:hover {
 /*--- Grey ---*/
 
 .ui.grey.header {
-  color: #9e9e9e !important;
+  color: #9E9E9E !important;
 }
 a.ui.grey.header:hover {
   color: #ababab !important;
 }
 .ui.grey.dividing.header {
-  border-bottom: 2px solid #9e9e9e;
+  border-bottom: 2px solid #9E9E9E;
 }
 
 /* Inverted */
 .ui.inverted.grey.header {
-  color: #dcddde !important;
+  color: #DCDDDE !important;
 }
 a.ui.inverted.grey.header:hover {
   color: #cfd0d2 !important;
@@ -599,7 +600,7 @@ a.ui.inverted.grey.header:hover {
 }
 
 /*-------------------
-       Fittted
+       Fitted
 --------------------*/
 
 .ui.fitted.header {
@@ -629,10 +630,10 @@ a.ui.inverted.grey.header:hover {
 --------------------*/
 
 .ui.block.header {
-  background: #f0f0f0;
-  padding: 0.69230769rem 1rem;
+  background: #F0F0F0;
+  padding: 0.76923077rem 1rem;
   box-shadow: none;
-  border: 1px solid #d4d4d5;
+  border: 1px solid #D4D4D5;
   border-radius: 4px;
 }
 .ui.tiny.block.header {
@@ -656,15 +657,15 @@ a.ui.inverted.grey.header:hover {
 --------------------*/
 
 .ui.attached.header {
-  background: #ffffff;
-  padding: 0.69230769rem 1rem;
+  background: #FFFFFF;
+  padding: 0.76923077rem 1rem;
   margin-left: -1px;
   margin-right: -1px;
   box-shadow: none;
-  border: 1px solid #d4d4d5;
+  border: 1px solid #D4D4D5;
 }
 .ui.attached.block.header {
-  background: #f0f0f0;
+  background: #F0F0F0;
 }
 .ui.attached:not(.top):not(.bottom).header {
   margin-top: 0em;
